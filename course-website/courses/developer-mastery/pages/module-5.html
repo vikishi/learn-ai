@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>The Automated Pipeline — Claude for Software Engineers</title>
+  <link rel="stylesheet" href="../css/styles.css">
+</head>
+<body>
+<div class="reading-progress"><div class="progress-fill"></div></div>
+<div class="layout" data-page="module-5">
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <a href="../index.html" class="sidebar-logo">
+        <span class="logo-icon">CC</span>
+        <span class="logo-text">Dev Mastery</span>
+      </a>
+    </div>
+    <div class="sidebar-progress">
+      <div class="progress-bar"><div class="progress-fill" style="width: 0%"></div></div>
+      <span class="progress-label">0/8 complete</span>
+    </div>
+    <nav class="sidebar-nav">
+            <div class="nav-section-label">Course Modules</div>
+      <a href="module-1.html" class="nav-item" data-page="module-1">Foundations &amp; Setup</a>
+      <a href="module-2.html" class="nav-item" data-page="module-2">Skills — Reusable Automation</a>
+      <a href="module-3.html" class="nav-item" data-page="module-3">Subagents — AI Workers</a>
+      <a href="module-4.html" class="nav-item" data-page="module-4">Hooks — Guardrails</a>
+      <a href="module-5.html" class="nav-item" data-page="module-5">Automated Pipeline</a>
+      <a href="module-6.html" class="nav-item" data-page="module-6">Documentation Automation</a>
+      <a href="module-7.html" class="nav-item" data-page="module-7">Advanced Patterns</a>
+      <a href="module-8.html" class="nav-item" data-page="module-8">Certification &amp; Next Steps</a>
+    </nav>
+  </aside>
+
+  <div class="sidebar-overlay"></div>
+
+  <!-- Main Content -->
+  <main class="main">
+    <div class="topbar">
+      <button class="sidebar-toggle">☰</button>
+      <div class="breadcrumb">
+        <a href="../index.html">Home</a> / <span>Module 5: Pipeline</span>
+      </div>
+    </div>
+    <div class="content">
+
+      <div class="page-header">
+        <span class="page-tag">Module 5</span>
+        <h1 class="page-title">The Automated Pipeline</h1>
+        <p class="page-desc">Chain skills, hooks, and CI/CD into a fully automated development pipeline — from feature request to merged PR with zero manual steps.</p>
+        <div class="page-meta">3 lessons · ~90 minutes · Advanced</div>
+      </div>
+
+      <!-- Lesson 5-1 -->
+      <h2>Lesson 5-1: The Full-Circle Workflow</h2>
+      <div class="page-meta">35 min · Hands-on</div>
+
+      <p>The ultimate Claude Code workflow chains every skill into a single pipeline that takes a feature from idea to shipped PR:</p>
+
+      <h3>The Pipeline</h3>
+      <ol>
+        <li><strong>Write</strong> — Implement the feature code</li>
+        <li><strong>Self-Review</strong> — AI reviews its own code for issues</li>
+        <li><strong>Generate Tests</strong> — Create comprehensive test coverage</li>
+        <li><strong>Run Tests</strong> — Execute tests and fix failures</li>
+        <li><strong>Lint/Format</strong> — Auto-fix style issues</li>
+        <li><strong>Security Check</strong> — Scan for vulnerabilities</li>
+        <li><strong>Commit</strong> — Create a conventional commit</li>
+        <li><strong>Push &amp; Create PR</strong> — Open a pull request with description</li>
+      </ol>
+
+      <h3>The /ship Skill</h3>
+      <p>This skill encapsulates the entire pipeline into a single command:</p>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span>markdown</span>
+          <button class="copy-btn">Copy</button>
+        </div>
+        <pre><code># /ship — Full Pipeline Skill
+
+## Steps
+
+1. **Self-Review** your implementation:
+   - Check for bugs, edge cases, error handling
+   - Verify naming conventions and code style
+   - Fix any issues found
+
+2. **Generate Tests**:
+   - Create unit tests for all new functions
+   - Add integration tests for API endpoints
+   - Aim for &gt;80% coverage on new code
+
+3. **Run Tests**:
+   - Execute: `npm test`
+   - If failures: fix and re-run (max 3 attempts)
+   - All tests must pass before continuing
+
+4. **Lint &amp; Format**:
+   - Run: `npm run lint:fix`
+   - Run: `npm run format`
+
+5. **Security Scan**:
+   - Run: `npm audit --production`
+   - Check for hardcoded secrets with grep
+   - Block if critical vulnerabilities found
+
+6. **Commit**:
+   - Stage all changes: `git add -A`
+   - Commit with conventional format: `type(scope): description`
+   - Include Co-authored-by trailer
+
+7. **Push &amp; PR**:
+   - Push branch: `git push -u origin HEAD`
+   - Create PR: `gh pr create --fill`
+   - Add labels based on change type
+
+8. **Report**:
+   - Summarize what was done
+   - List files changed
+   - Link to the PR</code></pre>
+      </div>
+
+      <h3>Headless Mode Execution</h3>
+      <p>Run the entire pipeline non-interactively with headless mode:</p>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span>bash</span>
+          <button class="copy-btn">Copy</button>
+        </div>
+        <pre><code>claude -p "implement the user avatar upload feature and /ship" \
+  --dangerously-skip-permissions</code></pre>
+      </div>
+
+      <div class="callout warning">
+        <div class="callout-icon">⚠️</div>
+        <div class="callout-body">
+          <div class="callout-title">Use --dangerously-skip-permissions Carefully</div>
+          <div class="callout-text">Only use <code>--dangerously-skip-permissions</code> for well-tested workflows where you trust all hooks and skills. This flag bypasses all permission prompts — Claude will execute any tool without asking. Always pair it with PreToolUse hooks that block dangerous operations.</div>
+        </div>
+      </div>
+
+      <!-- Lesson 5-2 -->
+      <h2>Lesson 5-2: CI/CD Integration with Claude Code</h2>
+      <div class="page-meta">Reference · Teams/Enterprise only</div>
+
+      <div class="callout warning">
+        <div class="callout-icon">⚠️</div>
+        <div class="callout-body">
+          <div class="callout-title">Requires Teams or Enterprise Plan</div>
+          <div class="callout-text">Running Claude Code headlessly in CI/CD pipelines (<code>claude -p</code> in GitHub Actions, automated PR bots, scheduled pipeline execution) requires a <strong>Teams or Enterprise</strong> subscription — it is not available on the Pro plan. This section is for awareness only.</div>
+        </div>
+      </div>
+
+      <h3>What's Possible (Teams/Enterprise)</h3>
+      <p>With a Teams or Enterprise plan, you can run Claude Code non-interactively inside CI/CD:</p>
+      <ul>
+        <li><strong>AI code review on every PR</strong> — automatically post a review comment when a pull request is opened</li>
+        <li><strong>Auto-generate missing tests</strong> — detect untested code and write tests as part of the CI run</li>
+        <li><strong>Security gate in CI</strong> — run the <code>/security-gate</code> skill on every merge and block on critical findings</li>
+        <li><strong>Scheduled quality reports</strong> — nightly cron jobs for coverage, TODO audits, and dependency scans</li>
+        <li><strong>Pre-commit hooks</strong> — lightweight local checks via <code>claude -p</code> before commits land</li>
+      </ul>
+
+      <p>These workflows use the same skills and subagents you build in this course — just triggered by CI events rather than your terminal.</p>
+
+      <div class="callout tip">
+        <div class="callout-icon">💡</div>
+        <div class="callout-body">
+          <div class="callout-title">When You're Ready</div>
+          <div class="callout-text">If you upgrade to Teams, see the <a href="https://code.claude.com/docs" target="_blank" rel="noopener">official Claude Code docs</a> for headless mode reference and GitHub Actions examples. The patterns are identical to the <code>/ship</code> skill — just triggered by webhook instead of your terminal.</div>
+        </div>
+      </div>
+
+      <!-- Lesson 5-3 -->
+      <h2>Lesson 5-3: MCP: Connecting Claude to Your Tools</h2>
+      <div class="page-meta">25 min · Hands-on</div>
+
+      <p>The Model Context Protocol (MCP) connects Claude to external tools — issue trackers, databases, monitoring systems — turning it into a fully integrated development assistant.</p>
+
+      <h3>MCP Server Setup</h3>
+      <div class="code-block">
+        <div class="code-header">
+          <span>bash</span>
+          <button class="copy-btn">Copy</button>
+        </div>
+        <pre><code># Connect to GitHub (issues, PRs, repos)
+claude mcp add github -- npx -y @anthropic-ai/github-mcp
+
+# Connect to PostgreSQL (query databases directly)
+claude mcp add postgres -- npx -y @anthropic-ai/postgres-mcp --connection-string "..."
+
+# Connect to Linear (project management)
+claude mcp add linear --env LINEAR_API_KEY=your_key -- npx -y @anthropic-ai/linear-mcp
+
+# Connect to Sentry (error monitoring)
+claude mcp add sentry --env SENTRY_AUTH_TOKEN=your_token -- npx -y @anthropic-ai/sentry-mcp</code></pre>
+      </div>
+
+      <h3>The "Implement from Ticket" Skill</h3>
+      <p>With MCP connections, you can build a skill that goes from ticket to shipped code:</p>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span>markdown</span>
+          <button class="copy-btn">Copy</button>
+        </div>
+        <pre><code># /from-ticket — Implement from Issue Tracker
+
+## Input
+- Ticket ID (e.g., LIN-1234 or GH#42)
+
+## Steps
+
+1. **Read Ticket**:
+   - Fetch ticket details from Linear/GitHub via MCP
+   - Extract requirements, acceptance criteria, and context
+
+2. **Explore Codebase**:
+   - Find relevant files based on ticket description
+   - Understand existing patterns and architecture
+
+3. **Implement**:
+   - Write the code following project conventions
+   - Handle edge cases mentioned in ticket
+
+4. **Test**:
+   - Generate tests matching acceptance criteria
+   - Run full test suite: `npm test`
+   - Fix any failures
+
+5. **Ship** (invoke /ship):
+   - Self-review, lint, security check
+   - Commit, push, create PR
+   - Link PR to ticket
+
+6. **Update Ticket**:
+   - Move ticket to "In Review" status
+   - Add comment with PR link and summary of changes
+   - Tag relevant reviewers</code></pre>
+      </div>
+
+      <div class="callout tip">
+        <div class="callout-icon">💡</div>
+        <div class="callout-body">
+          <div class="callout-title">The 10x Workflow</div>
+          <div class="callout-text">This is the 10x workflow: ticket → code → tested → reviewed → shipped → ticket updated. A single command transforms a ticket into a complete, tested, reviewed pull request with the ticket automatically updated. What used to take hours now takes minutes.</div>
+        </div>
+      </div>
+
+      <div class="page-nav">
+        <a href="module-4.html" class="page-nav-btn prev">
+          <span class="nav-btn-arrow">←</span>
+          <div>
+            <div class="nav-btn-label">Previous</div>
+            <div class="nav-btn-title">Hooks — Guardrails</div>
+          </div>
+        </a>
+        <a href="module-6.html" class="page-nav-btn next">
+          <span class="nav-btn-arrow">→</span>
+          <div>
+            <div class="nav-btn-label">Next</div>
+            <div class="nav-btn-title">Documentation Automation</div>
+          </div>
+        </a>
+      </div>
+    </div>
+  </main>
+</div>
+<script src="../js/main.js"></script>
+</body>
+</html>

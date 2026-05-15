@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Foundations &amp; Setup — Claude for Software Engineers</title>
+  <link rel="stylesheet" href="../css/styles.css">
+</head>
+<body>
+<div class="reading-progress"><div class="progress-fill"></div></div>
+<div class="layout" data-page="module-1">
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <a href="../index.html" class="sidebar-logo">
+        <span class="logo-icon">CC</span>
+        <span class="logo-text">Dev Mastery</span>
+      </a>
+    </div>
+    <div class="sidebar-progress">
+      <div class="progress-bar"><div class="progress-fill" style="width: 0%"></div></div>
+      <span class="progress-label">0/8 complete</span>
+    </div>
+    <nav class="sidebar-nav">
+            <div class="nav-section-label">Course Modules</div>
+      <a href="module-1.html" class="nav-item" data-page="module-1">Foundations &amp; Setup</a>
+      <a href="module-2.html" class="nav-item" data-page="module-2">Skills — Reusable Automation</a>
+      <a href="module-3.html" class="nav-item" data-page="module-3">Subagents — AI Workers</a>
+      <a href="module-4.html" class="nav-item" data-page="module-4">Hooks — Guardrails</a>
+      <a href="module-5.html" class="nav-item" data-page="module-5">Automated Pipeline</a>
+      <a href="module-6.html" class="nav-item" data-page="module-6">Documentation Automation</a>
+      <a href="module-7.html" class="nav-item" data-page="module-7">Advanced Patterns</a>
+      <a href="module-8.html" class="nav-item" data-page="module-8">Certification &amp; Next Steps</a>
+    </nav>
+  </aside>
+
+  <div class="sidebar-overlay"></div>
+
+  <!-- Main Content -->
+  <main class="main">
+    <div class="topbar">
+      <button class="sidebar-toggle">☰</button>
+      <div class="breadcrumb">
+        <a href="../index.html">Home</a> / <span>Module 1: Foundations &amp; Setup</span>
+      </div>
+    </div>
+    <div class="content">
+
+      <div class="page-header">
+        <span class="page-tag">Module 1</span>
+        <h1 class="page-title">Foundations &amp; Setup</h1>
+        <p class="page-desc">Understand the Claude Code ecosystem, write an effective CLAUDE.md, and map out your learning path through Anthropic's official courses.</p>
+        <div class="page-meta">3 lessons · ~60 minutes · Beginner</div>
+      </div>
+
+      <!-- Lesson 1-1 -->
+      <h2>Lesson 1-1: The Claude Code Ecosystem</h2>
+      <div class="page-meta">20 min · Concept</div>
+
+      <p>Claude Code has four extensibility layers that transform it from a simple chat into a fully configurable development platform:</p>
+
+      <ol>
+        <li><strong>CLAUDE.md — Project Memory:</strong> A markdown file at your project root that persists across sessions and defines conventions, tech stack, and architecture decisions.</li>
+        <li><strong>Skills — Reusable Prompt Templates:</strong> Located at <code>.claude/skills/&lt;name&gt;/SKILL.md</code>, they auto-detect and trigger based on context, and inject live data with <code>!`command`</code> syntax.</li>
+        <li><strong>Subagents — Parallel AI Workers:</strong> Defined in <code>.claude/agents/</code> files, each with its own context window, system prompt, and model selection.</li>
+        <li><strong>Hooks — Deterministic Lifecycle Events:</strong> Fire at specific points in the workflow, execute real code, and cannot hallucinate because they run deterministic scripts.</li>
+      </ol>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span>bash</span>
+          <button class="copy-btn">Copy</button>
+        </div>
+        <pre><code>npm install -g @anthropic-ai/claude-code
+cd your-project
+claude
+# Inside Claude Code:
+/init    # Generates CLAUDE.md by scanning your repo
+/context # See how your context window is being used
+/help    # Browse all available commands</code></pre>
+      </div>
+
+      <div class="callout tip">
+        <div class="callout-icon">💡</div>
+        <div class="callout-body">
+          <div class="callout-title">Platform, Not Just a Chat</div>
+          <div class="callout-text">Claude Code is a platform you configure, not just a chat you prompt. The four extensibility layers let you encode your team's entire workflow into repeatable, version-controlled automation.</div>
+        </div>
+      </div>
+
+      <!-- Lesson 1-2 -->
+      <h2>Lesson 1-2: Writing an Effective CLAUDE.md</h2>
+      <div class="page-meta">25 min · Hands-on</div>
+
+      <h3>What Belongs in CLAUDE.md</h3>
+      <ul>
+        <li>Tech stack and versions</li>
+        <li>Architecture overview (directory structure)</li>
+        <li>Coding conventions and patterns</li>
+        <li>Common commands (test, lint, build, deploy)</li>
+      </ul>
+
+      <h3>What Does NOT Belong</h3>
+      <ul>
+        <li>Long documentation or API references</li>
+        <li>Temporary instructions or one-off tasks</li>
+        <li>Everything — be selective and concise</li>
+      </ul>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span>markdown</span>
+          <button class="copy-btn">Copy</button>
+        </div>
+        <pre><code># Project: Acme API
+
+## Tech Stack
+- Node.js 20 + TypeScript 5.4
+- Express with Zod validation
+- PostgreSQL 16 + Drizzle ORM
+- Jest for testing, Prettier + ESLint for formatting
+
+## Architecture
+- src/routes/ — Express route handlers
+- src/services/ — Business logic (no DB access)
+- src/repositories/ — Database access layer
+- src/middleware/ — Auth, rate limiting, error handling
+
+## Conventions
+- Every route handler must validate input with Zod schemas
+- Services return Result&lt;T, Error&gt; types, never throw
+- All DB queries go through repositories, never raw SQL in services
+- Tests live next to source files: user.service.ts → user.service.test.ts
+
+## Commands
+- npm test — run all tests
+- npm run lint — run ESLint + Prettier check
+- npm run migrate — run Drizzle migrations</code></pre>
+      </div>
+
+      <div class="callout warning">
+        <div class="callout-icon">⚠️</div>
+        <div class="callout-body">
+          <div class="callout-title">Keep It Short</div>
+          <div class="callout-text">Keep CLAUDE.md under 200 lines. Every token counts against your context window. A bloated CLAUDE.md means less room for actual code and conversation.</div>
+        </div>
+      </div>
+
+      <!-- Lesson 1-3 -->
+      <h2>Lesson 1-3: Anthropic Skilljar Courses</h2>
+      <div class="page-meta">15 min · Concept</div>
+
+      <p>Anthropic offers a structured Developer Track on Skilljar. Complete these courses in order to build a strong foundation:</p>
+
+      <h3>Developer Track (Recommended Order)</h3>
+      <ol>
+        <li><strong>Claude Code 101</strong> (~1 hour) — Core concepts and basic usage</li>
+        <li><strong>Claude Code in Action</strong> (~3-4 hours) — Real-world workflows and patterns</li>
+        <li><strong>Introduction to Subagents</strong> (~1 hour) — Parallel AI workers</li>
+        <li><strong>Introduction to Agent Skills</strong> (~2 hours) — Reusable automation</li>
+        <li><strong>Introduction to MCP</strong> (~2 hours) — Model Context Protocol</li>
+        <li><strong>Building with the Claude API</strong> (~8 hours) — Full API development</li>
+      </ol>
+
+      <h3>Supplementary Courses</h3>
+      <ul>
+        <li>Introduction to Claude Cowork</li>
+        <li>AI Capabilities and Limitations</li>
+      </ul>
+
+      <div class="callout checkpoint">
+        <div class="callout-icon">✅</div>
+        <div class="callout-body">
+          <div class="callout-title">Checkpoint</div>
+          <div class="callout-text">Go to <strong>anthropic.skilljar.com</strong> and enroll in the Developer Track. Start with Claude Code 101. Complete it before moving to Module 2.</div>
+        </div>
+      </div>
+
+      <div class="page-nav">
+        <a href="../index.html" class="page-nav-btn prev">
+          <span class="nav-btn-arrow">←</span>
+          <div>
+            <div class="nav-btn-label">Previous</div>
+            <div class="nav-btn-title">Course Home</div>
+          </div>
+        </a>
+        <a href="module-2.html" class="page-nav-btn next">
+          <span class="nav-btn-arrow">→</span>
+          <div>
+            <div class="nav-btn-label">Next</div>
+            <div class="nav-btn-title">Skills — Reusable Automation</div>
+          </div>
+        </a>
+      </div>
+    </div>
+  </main>
+</div>
+<script src="../js/main.js"></script>
+</body>
+</html>

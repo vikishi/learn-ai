@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Documentation Automation — Claude for Software Engineers</title>
+  <link rel="stylesheet" href="../css/styles.css">
+</head>
+<body>
+<div class="reading-progress"><div class="progress-fill"></div></div>
+<div class="layout" data-page="module-6">
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <a href="../index.html" class="sidebar-logo">
+        <span class="logo-icon">CC</span>
+        <span class="logo-text">Dev Mastery</span>
+      </a>
+    </div>
+    <div class="sidebar-progress">
+      <div class="progress-bar"><div class="progress-fill" style="width: 0%"></div></div>
+      <span class="progress-label">0/8 complete</span>
+    </div>
+    <nav class="sidebar-nav">
+            <div class="nav-section-label">Course Modules</div>
+      <a href="module-1.html" class="nav-item" data-page="module-1">Foundations &amp; Setup</a>
+      <a href="module-2.html" class="nav-item" data-page="module-2">Skills — Reusable Automation</a>
+      <a href="module-3.html" class="nav-item" data-page="module-3">Subagents — AI Workers</a>
+      <a href="module-4.html" class="nav-item" data-page="module-4">Hooks — Guardrails</a>
+      <a href="module-5.html" class="nav-item" data-page="module-5">Automated Pipeline</a>
+      <a href="module-6.html" class="nav-item" data-page="module-6">Documentation Automation</a>
+      <a href="module-7.html" class="nav-item" data-page="module-7">Advanced Patterns</a>
+      <a href="module-8.html" class="nav-item" data-page="module-8">Certification &amp; Next Steps</a>
+    </nav>
+  </aside>
+
+  <div class="sidebar-overlay"></div>
+
+  <!-- Main Content -->
+  <main class="main">
+    <div class="topbar">
+      <button class="sidebar-toggle">☰</button>
+      <div class="breadcrumb">
+        <a href="../index.html">Home</a> / <span>Module 6: Documentation</span>
+      </div>
+    </div>
+    <div class="content">
+
+      <div class="page-header">
+        <span class="page-tag">Module 8</span>
+        <h1 class="page-title">Documentation Automation</h1>
+        <p class="page-desc">Build living documentation that auto-updates when code changes — API docs, changelogs, and onboarding guides that never go stale.</p>
+        <div class="page-meta">1 lesson · ~25 minutes · Advanced</div>
+      </div>
+
+      <!-- Lesson 8-1 -->
+      <h2>Lesson 8-1: Living Documentation Skills</h2>
+      <div class="page-meta">25 min · Hands-on</div>
+
+      <p>Documentation that auto-updates when code changes. These three skills ensure your docs are always current — no more "the docs are outdated" excuses.</p>
+
+      <h3>1. /doc-api — Generate API Documentation</h3>
+      <p>Automatically generates OpenAPI-compatible documentation from your route handlers:</p>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span>markdown</span>
+          <button class="copy-btn">Copy</button>
+        </div>
+        <pre><code>---
+description: Generates API documentation from route handlers.
+  Auto-invokes when the user creates or modifies API routes.
+---
+## Current routes
+!`grep -rn "router\." src/routes/ | head -50`
+
+## Instructions
+1. Read all route handler files
+2. For each endpoint, document:
+   - Method and path
+   - Request body schema (from Zod/Joi validators)
+   - Response schema with examples
+   - Authentication requirements
+   - Error responses
+3. Generate OpenAPI-compatible documentation
+4. Save to docs/api/</code></pre>
+      </div>
+
+      <h3>2. /changelog — Generate Changelog from Commits</h3>
+      <p>Transforms raw git history into a user-friendly changelog, grouped by category:</p>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span>markdown</span>
+          <button class="copy-btn">Copy</button>
+        </div>
+        <pre><code>---
+description: Generates a user-friendly changelog from git history.
+disable-model-invocation: true
+---
+## Recent commits
+!`git log --oneline --since="1 week ago"`
+
+## Instructions
+Group commits into:
+- ✨ Features — New functionality
+- 🐛 Bug Fixes — Corrections
+- ⚡ Performance — Speed improvements
+- 🔒 Security — Vulnerability patches
+- 📖 Documentation — Doc updates
+- 🔧 Maintenance — Refactoring, dependency updates
+
+Write in user-friendly language. Append to CHANGELOG.md.</code></pre>
+      </div>
+
+      <h3>3. /onboard — Generate Onboarding Guide</h3>
+      <p>Creates a comprehensive onboarding document for new team members by analyzing the actual project:</p>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span>markdown</span>
+          <button class="copy-btn">Copy</button>
+        </div>
+        <pre><code>---
+description: Generates an onboarding guide for new developers.
+  Use when a new team member joins or project setup changes.
+---
+## Project info
+!`cat package.json | head -20`
+!`cat README.md | head -50`
+
+## Instructions
+Generate a comprehensive onboarding guide covering:
+
+1. **Prerequisites** — Required tools, versions, accounts
+2. **Environment Setup** — Step-by-step local dev setup
+3. **Project Structure** — Directory layout with explanations
+4. **Development Workflow** — Branch strategy, PR process
+5. **How to Run** — Dev server, build, watch mode
+6. **How to Test** — Unit, integration, e2e commands
+7. **How to Deploy** — Staging and production processes
+8. **Architecture Decisions** — Link to ADRs or summarize key choices
+9. **Common Gotchas** — Things that trip up new developers
+10. **Key Contacts** — Who to ask about what
+
+Save to docs/ONBOARDING.md</code></pre>
+      </div>
+
+      <div class="callout tip">
+        <div class="callout-icon">💡</div>
+        <div class="callout-body">
+          <div class="callout-title">Auto-Update Docs on Route Changes</div>
+          <div class="callout-text">Add a PostToolUse hook that reminds Claude to update docs when route files change. This ensures API documentation stays in sync with the actual implementation.</div>
+        </div>
+      </div>
+
+      <div class="callout checkpoint">
+        <div class="callout-icon">🎯</div>
+        <div class="callout-body">
+          <div class="callout-title">Checkpoint</div>
+          <div class="callout-text">Run <code>/doc-api</code> and <code>/changelog</code> on your project — would these help your team? Customize the templates to match your project's conventions.</div>
+        </div>
+      </div>
+
+      <div class="page-nav">
+        <a href="module-5.html" class="page-nav-btn prev">
+          <span class="nav-btn-arrow">←</span>
+          <div>
+            <div class="nav-btn-label">Previous</div>
+            <div class="nav-btn-title">Automated Pipeline</div>
+          </div>
+        </a>
+        <a href="module-7.html" class="page-nav-btn next">
+          <span class="nav-btn-arrow">→</span>
+          <div>
+            <div class="nav-btn-label">Next</div>
+            <div class="nav-btn-title">Advanced Patterns</div>
+          </div>
+        </a>
+      </div>
+    </div>
+  </main>
+</div>
+<script src="../js/main.js"></script>
+</body>
+</html>

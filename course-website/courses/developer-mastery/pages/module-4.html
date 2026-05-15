@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hooks — Deterministic Guardrails — Claude for Software Engineers</title>
+  <link rel="stylesheet" href="../css/styles.css">
+</head>
+<body>
+<div class="reading-progress"><div class="progress-fill"></div></div>
+<div class="layout" data-page="module-4">
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <a href="../index.html" class="sidebar-logo">
+        <span class="logo-icon">CC</span>
+        <span class="logo-text">Dev Mastery</span>
+      </a>
+    </div>
+    <div class="sidebar-progress">
+      <div class="progress-bar"><div class="progress-fill" style="width: 0%"></div></div>
+      <span class="progress-label">0/8 complete</span>
+    </div>
+    <nav class="sidebar-nav">
+            <div class="nav-section-label">Course Modules</div>
+      <a href="module-1.html" class="nav-item" data-page="module-1">Foundations &amp; Setup</a>
+      <a href="module-2.html" class="nav-item" data-page="module-2">Skills — Reusable Automation</a>
+      <a href="module-3.html" class="nav-item" data-page="module-3">Subagents — AI Workers</a>
+      <a href="module-4.html" class="nav-item" data-page="module-4">Hooks — Guardrails</a>
+      <a href="module-5.html" class="nav-item" data-page="module-5">Automated Pipeline</a>
+      <a href="module-6.html" class="nav-item" data-page="module-6">Documentation Automation</a>
+      <a href="module-7.html" class="nav-item" data-page="module-7">Advanced Patterns</a>
+      <a href="module-8.html" class="nav-item" data-page="module-8">Certification &amp; Next Steps</a>
+    </nav>
+  </aside>
+
+  <div class="sidebar-overlay"></div>
+
+  <!-- Main Content -->
+  <main class="main">
+    <div class="topbar">
+      <button class="sidebar-toggle">☰</button>
+      <div class="breadcrumb">
+        <a href="../index.html">Home</a> / <span>Module 4: Hooks</span>
+      </div>
+    </div>
+    <div class="content">
+
+      <div class="page-header">
+        <span class="page-tag">Module 4</span>
+        <h1 class="page-title">Hooks — Deterministic Guardrails</h1>
+        <p class="page-desc">Enforce hard constraints on Claude's actions with real code that cannot be hallucinated or ignored — deterministic guardrails for your AI workflow.</p>
+        <div class="page-meta">2 lessons · ~55 minutes · Intermediate</div>
+      </div>
+
+      <!-- Lesson 4-1 -->
+      <h2>Lesson 4-1: Hook Types and Lifecycle</h2>
+      <div class="page-meta">25 min · Concept</div>
+
+      <p>CLAUDE.md instructions are advisory — they achieve roughly ~80% compliance. Hooks are fundamentally different: they are <strong>deterministic</strong>. They run real code that cannot be hallucinated, skipped, or misinterpreted.</p>
+
+      <h3>Lifecycle Events</h3>
+      <p>Hooks fire at specific points in Claude's execution lifecycle:</p>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span>text</span>
+          <button class="copy-btn">Copy</button>
+        </div>
+        <pre><code>UserPromptSubmit → PreToolUse → PermissionRequest → PostToolUse → Stop</code></pre>
+      </div>
+
+      <h3>Four Hook Types</h3>
+      <ol>
+        <li><strong>Command hooks</strong> — Shell script execution. Exit code 0 = success, exit code 2 = block the action.</li>
+        <li><strong>HTTP hooks</strong> — POST to a URL (CI systems, dashboards, Slack notifications).</li>
+        <li><strong>Prompt hooks</strong> — Single-turn LLM evaluation for fuzzy checks.</li>
+        <li><strong>Agent hooks</strong> — Spawns a subagent with tool access for complex validation logic.</li>
+      </ol>
+
+      <h3>Hook Configuration</h3>
+      <p>Hooks are configured in your VS Code <code>settings.json</code> under the <code>claude-code</code> namespace:</p>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span>json</span>
+          <button class="copy-btn">Copy</button>
+        </div>
+        <pre><code>{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "type": "command",
+        "command": "node .claude/hooks/block-dangerous.js",
+        "description": "Block force-push and production DB access"
+      }
+    ]
+  }
+}</code></pre>
+      </div>
+
+      <h3>Block Dangerous Commands Script</h3>
+      <p>This hook intercepts tool calls and blocks dangerous commands before they execute:</p>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span>javascript</span>
+          <button class="copy-btn">Copy</button>
+        </div>
+        <pre><code>// .claude/hooks/block-dangerous.js
+const input = JSON.parse(require('fs').readFileSync('/dev/stdin', 'utf8'));
+const cmd = input?.tool_input?.command || '';
+
+const blocked = [
+  /git push.*--force/,
+  /git push.*-f/,
+  /rm -rf \//,
+  /DROP TABLE/i,
+  /DROP DATABASE/i,
+  /psql.*production/,
+];
+
+if (blocked.some(pattern =&gt; pattern.test(cmd))) {
+  console.error('🚫 BLOCKED: Dangerous command detected');
+  process.exit(2); // Exit code 2 = block the action
+}
+process.exit(0); // Allow</code></pre>
+      </div>
+
+      <div class="callout critical">
+        <div class="callout-icon">🛑</div>
+        <div class="callout-body">
+          <div class="callout-title">Exit Code 2 = Hard Block</div>
+          <div class="callout-text">Exit code 2 blocks the action entirely. Claude never runs the command. This is a deterministic guarantee — unlike CLAUDE.md instructions, hooks cannot be ignored or worked around by the AI.</div>
+        </div>
+      </div>
+
+      <!-- Lesson 4-2 -->
+      <h2>Lesson 4-2: Auto-Lint, Auto-Test, and Audit Hooks</h2>
+      <div class="page-meta">30 min · Hands-on</div>
+
+      <p>Now let's build practical hooks that automate quality enforcement: auto-formatting after edits, running tests before session end, and maintaining a complete audit trail.</p>
+
+      <h3>1. PostToolUse Auto-Lint Hook</h3>
+      <p>Automatically run ESLint with auto-fix after every file edit:</p>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span>json</span>
+          <button class="copy-btn">Copy</button>
+        </div>
+        <pre><code>{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "type": "command",
+        "command": "node .claude/hooks/auto-lint.js",
+        "description": "Auto-lint files after edit"
+      }
+    ]
+  }
+}</code></pre>
+      </div>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span>javascript</span>
+          <button class="copy-btn">Copy</button>
+        </div>
+        <pre><code>// .claude/hooks/auto-lint.js
+const { execSync } = require('child_process');
+const input = JSON.parse(require('fs').readFileSync('/dev/stdin', 'utf8'));
+
+const filePath = input?.tool_input?.file_path || input?.tool_result?.file_path;
+if (!filePath) process.exit(0);
+
+const lintable = /\.(js|ts|jsx|tsx)$/.test(filePath);
+if (!lintable) process.exit(0);
+
+try {
+  execSync(`npx eslint --fix "${filePath}"`, { stdio: 'pipe' });
+  console.log(`✅ Auto-linted: ${filePath}`);
+} catch (e) {
+  console.warn(`⚠️ Lint issues in: ${filePath}`);
+}
+process.exit(0);</code></pre>
+      </div>
+
+      <h3>2. Stop Hook — Run Tests Before Session Ends</h3>
+      <p>Ensure tests pass before Claude completes its work:</p>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span>json</span>
+          <button class="copy-btn">Copy</button>
+        </div>
+        <pre><code>{
+  "hooks": {
+    "Stop": [
+      {
+        "type": "command",
+        "command": "npm test",
+        "description": "Run test suite before session ends"
+      }
+    ]
+  }
+}</code></pre>
+      </div>
+
+      <h3>3. PreToolUse Audit Log Hook</h3>
+      <p>Log every tool call to a JSONL file for complete accountability:</p>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span>json</span>
+          <button class="copy-btn">Copy</button>
+        </div>
+        <pre><code>{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "type": "command",
+        "command": "node .claude/hooks/audit-log.js",
+        "description": "Log all tool calls to audit trail"
+      }
+    ]
+  }
+}</code></pre>
+      </div>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span>javascript</span>
+          <button class="copy-btn">Copy</button>
+        </div>
+        <pre><code>// .claude/hooks/audit-log.js
+const fs = require('fs');
+const input = JSON.parse(fs.readFileSync('/dev/stdin', 'utf8'));
+
+const entry = {
+  timestamp: new Date().toISOString(),
+  tool: input.tool_name,
+  input: input.tool_input,
+  session: input.session_id,
+};
+
+fs.appendFileSync('.claude/audit.jsonl', JSON.stringify(entry) + '\n');
+process.exit(0);</code></pre>
+      </div>
+
+      <div class="callout tip">
+        <div class="callout-icon">💡</div>
+        <div class="callout-body">
+          <div class="callout-title">Audit on PreToolUse</div>
+          <div class="callout-text">Register the audit log on PreToolUse for complete accountability in team environments. This captures every tool call attempt — including ones that get blocked by other hooks — giving you a full picture of what Claude tried to do.</div>
+        </div>
+      </div>
+
+      <div class="callout checkpoint">
+        <div class="callout-icon">🎯</div>
+        <div class="callout-body">
+          <div class="callout-title">Checkpoint</div>
+          <div class="callout-text">Test the auto-lint hook by asking Claude to create a TypeScript file with intentional formatting issues. Verify that ESLint automatically fixes them after the file is written.</div>
+        </div>
+      </div>
+
+      <div class="page-nav">
+        <a href="module-3.html" class="page-nav-btn prev">
+          <span class="nav-btn-arrow">←</span>
+          <div>
+            <div class="nav-btn-label">Previous</div>
+            <div class="nav-btn-title">Subagents — AI Workers</div>
+          </div>
+        </a>
+        <a href="module-5.html" class="page-nav-btn next">
+          <span class="nav-btn-arrow">→</span>
+          <div>
+            <div class="nav-btn-label">Next</div>
+            <div class="nav-btn-title">Automated Pipeline</div>
+          </div>
+        </a>
+      </div>
+    </div>
+  </main>
+</div>
+<script src="../js/main.js"></script>
+</body>
+</html>

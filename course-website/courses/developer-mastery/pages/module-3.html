@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Subagents — Parallel AI Workers — Claude for Software Engineers</title>
+  <link rel="stylesheet" href="../css/styles.css">
+</head>
+<body>
+<div class="reading-progress"><div class="progress-fill"></div></div>
+<div class="layout" data-page="module-3">
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <a href="../index.html" class="sidebar-logo">
+        <span class="logo-icon">CC</span>
+        <span class="logo-text">Dev Mastery</span>
+      </a>
+    </div>
+    <div class="sidebar-progress">
+      <div class="progress-bar"><div class="progress-fill" style="width: 0%"></div></div>
+      <span class="progress-label">0/8 complete</span>
+    </div>
+    <nav class="sidebar-nav">
+            <div class="nav-section-label">Course Modules</div>
+      <a href="module-1.html" class="nav-item" data-page="module-1">Foundations &amp; Setup</a>
+      <a href="module-2.html" class="nav-item" data-page="module-2">Skills — Reusable Automation</a>
+      <a href="module-3.html" class="nav-item" data-page="module-3">Subagents — AI Workers</a>
+      <a href="module-4.html" class="nav-item" data-page="module-4">Hooks — Guardrails</a>
+      <a href="module-5.html" class="nav-item" data-page="module-5">Automated Pipeline</a>
+      <a href="module-6.html" class="nav-item" data-page="module-6">Documentation Automation</a>
+      <a href="module-7.html" class="nav-item" data-page="module-7">Advanced Patterns</a>
+      <a href="module-8.html" class="nav-item" data-page="module-8">Certification &amp; Next Steps</a>
+    </nav>
+  </aside>
+
+  <div class="sidebar-overlay"></div>
+
+  <!-- Main Content -->
+  <main class="main">
+    <div class="topbar">
+      <button class="sidebar-toggle">☰</button>
+      <div class="breadcrumb">
+        <a href="../index.html">Home</a> / <span>Module 3: Subagents</span>
+      </div>
+    </div>
+    <div class="content">
+
+      <div class="page-header">
+        <span class="page-tag">Module 3</span>
+        <h1 class="page-title">Subagents — Parallel AI Workers</h1>
+        <p class="page-desc">Spawn specialized AI workers with isolated context windows to handle complex tasks in parallel without degrading your main session.</p>
+        <div class="page-meta">3 lessons · ~85 minutes · Intermediate</div>
+      </div>
+
+      <!-- Lesson 3-1 -->
+      <h2>Lesson 3-1: Understanding Subagents</h2>
+      <div class="page-meta">25 min · Concept</div>
+
+      <p>As your main Claude Code session accumulates context — file contents, conversation history, tool outputs — it approaches the context window limit. Quality degrades. Subagents solve this by spawning fresh AI workers, each with its own isolated context window dedicated to a specific task.</p>
+
+      <h3>Built-in Subagents</h3>
+      <ul>
+        <li><strong>Explore</strong> — Codebase research and navigation</li>
+        <li><strong>Plan</strong> — Architecture design and implementation planning</li>
+        <li><strong>Bash</strong> — Run commands and process output</li>
+        <li><strong>General-purpose</strong> — Full-capability worker for complex tasks</li>
+      </ul>
+
+      <h3>Architecture</h3>
+      <div class="code-block">
+        <div class="code-header">
+          <span>text</span>
+          <button class="copy-btn">Copy</button>
+        </div>
+        <pre><code>Primary Agent (your main Claude Code session)
+│
+├── Subagent A (Explore: codebase research)
+│   └── Returns findings to parent
+├── Subagent B (Bash: run tests in parallel)
+│   └── Returns test results
+├── Subagent C (Plan: design architecture)
+│   └── Returns implementation plan
+└── Primary agent synthesizes results &amp; makes edits</code></pre>
+      </div>
+
+      <h3>Skills vs Subagents</h3>
+      <p>These two systems are complementary, not competing:</p>
+      <ul>
+        <li><strong>Skills</strong> = reusable instructions (what to do) — they define the task template</li>
+        <li><strong>Subagents</strong> = specialized workers (who does it) — they execute with dedicated resources</li>
+      </ul>
+      <p>A skill tells Claude <em>what</em> to do. A subagent is a dedicated worker <em>who</em> does it with its own context window, model, and tool access.</p>
+
+      <div class="callout warning">
+        <div class="callout-icon">⚠️</div>
+        <div class="callout-body">
+          <div class="callout-title">Token Cost Awareness</div>
+          <div class="callout-text">Subagent-heavy workflows can use ~7x more tokens than single-agent approaches. Each subagent gets its own context window, which means duplicate system prompts and project context. Use subagents when the quality benefit justifies the cost — complex tasks, parallel execution, or when your main context is nearly full.</div>
+        </div>
+      </div>
+
+      <!-- Lesson 3-2 -->
+      <h2>Lesson 3-2: Building Custom Subagents</h2>
+      <div class="page-meta">30 min · Hands-on</div>
+
+      <p>Custom subagents live in <code>.claude/agents/</code> as markdown files with YAML frontmatter specifying their model, available tools, and isolation level.</p>
+
+      <h3>1. Code Reviewer</h3>
+      <div class="code-block">
+        <div class="code-header">
+          <span>markdown</span>
+          <button class="copy-btn">Copy</button>
+        </div>
+        <pre><code>---
+model: sonnet
+tools:
+  - Read
+  - Grep
+  - Glob
+  - Bash
+---
+# Code Reviewer Agent
+
+You are a senior code reviewer. Your job is to review changes
+for correctness, security, performance, and maintainability.
+
+## Process
+1. Read the diff or changed files provided
+2. Understand the intent of the changes
+3. Check for bugs, security issues, and performance problems
+4. Verify tests exist and cover new behavior
+5. Provide actionable feedback with severity levels
+
+## Output Format
+- 🔴 **Critical**: Must fix before merge
+- 🟡 **Warning**: Should fix, not blocking
+- 🟢 **Suggestion**: Nice to have improvement
+- ✅ **Approved**: No issues found
+
+Be specific. Reference line numbers. Suggest fixes.</code></pre>
+      </div>
+
+      <h3>2. Security Auditor</h3>
+      <div class="code-block">
+        <div class="code-header">
+          <span>markdown</span>
+          <button class="copy-btn">Copy</button>
+        </div>
+        <pre><code>---
+model: opus
+tools:
+  - Read
+  - Grep
+  - Glob
+  - Bash
+---
+# Security Auditor Agent
+
+You are a security specialist focused on finding vulnerabilities
+in application code. Think like an attacker.
+
+## Audit Checklist
+1. **Injection** — SQL, NoSQL, command, LDAP injection vectors
+2. **Authentication** — weak passwords, missing MFA, session issues
+3. **Authorization** — privilege escalation, IDOR, missing checks
+4. **Data Exposure** — secrets in code, PII leaks, verbose errors
+5. **Dependencies** — known CVEs, outdated packages, supply chain
+6. **Configuration** — debug mode, default credentials, CORS
+
+## Process
+1. Scan for hardcoded secrets and credentials
+2. Trace user input from entry point to database/system calls
+3. Check authentication and authorization at every boundary
+4. Review dependency versions against known CVE databases
+5. Verify error handling doesn't expose internals
+
+## Output
+Report findings with CVSS-like severity and remediation steps.</code></pre>
+      </div>
+
+      <h3>3. Test Writer</h3>
+      <div class="code-block">
+        <div class="code-header">
+          <span>markdown</span>
+          <button class="copy-btn">Copy</button>
+        </div>
+        <pre><code>---
+model: sonnet
+tools:
+  - Read
+  - Grep
+  - Glob
+  - Bash
+---
+# Test Writer Agent
+
+You are a test engineer who writes comprehensive, maintainable tests.
+
+## Principles
+- Test behavior, not implementation
+- One assertion per test (when practical)
+- Descriptive names: "should [behavior] when [condition]"
+- Arrange-Act-Assert pattern
+- Mock external dependencies, not internal modules
+
+## Process
+1. Read the source file to understand the public API
+2. Identify existing test patterns in the project
+3. Write tests covering:
+   - Happy path (expected inputs → expected outputs)
+   - Edge cases (empty, null, boundary values)
+   - Error cases (invalid inputs, failures)
+4. Run the tests to verify they pass
+5. Check coverage if tools are available
+
+## Output
+Complete test files ready to commit. Follow project conventions.</code></pre>
+      </div>
+
+      <h4>Key Frontmatter Options</h4>
+      <ul>
+        <li><strong>model</strong> — Which Claude model to use (haiku, sonnet, opus)</li>
+        <li><strong>tools</strong> — Which tools the agent can access</li>
+        <li><strong>isolation</strong> — Context isolation level from parent</li>
+      </ul>
+
+      <div class="callout checkpoint">
+        <div class="callout-icon">✅</div>
+        <div class="callout-body">
+          <div class="callout-title">Checkpoint</div>
+          <div class="callout-text">Create all three subagents in your <code>.claude/agents/</code> directory. Test each one by invoking them with real code changes. Verify they produce useful output within their specialized domain.</div>
+        </div>
+      </div>
+
+      <!-- Lesson 3-3 -->
+      <h2>Lesson 3-3: Orchestrating Agent Teams</h2>
+      <div class="page-meta">30 min · Hands-on</div>
+
+      <p>Real power comes from orchestrating multiple subagents as a team. Each agent handles its specialty while the primary agent coordinates the workflow.</p>
+
+      <h3>Full Agent Team Structure</h3>
+      <div class="code-block">
+        <div class="code-header">
+          <span>text</span>
+          <button class="copy-btn">Copy</button>
+        </div>
+        <pre><code>.claude/agents/
+  explorer.md        # Codebase research &amp; navigation
+  architect.md       # System design &amp; planning
+  implementer.md     # Code writing &amp; refactoring
+  test-writer.md     # Test generation &amp; coverage
+  code-reviewer.md   # Quality &amp; correctness review
+  security-auditor.md # Security vulnerability scanning</code></pre>
+      </div>
+
+      <h3>Build Validator (Lightweight Agent)</h3>
+      <div class="code-block">
+        <div class="code-header">
+          <span>markdown</span>
+          <button class="copy-btn">Copy</button>
+        </div>
+        <pre><code>---
+model: haiku
+tools:
+  - Bash
+---
+# Build Validator Agent
+
+You are a build validation agent. Your only job is to run
+build commands and report pass/fail status.
+
+## Process
+1. Run the build command: `npm run build`
+2. Run the linter: `npm run lint`
+3. Run the test suite: `npm test`
+4. Report results in this format:
+
+## Results
+- Build: ✅ PASS / ❌ FAIL (error summary)
+- Lint: ✅ PASS / ❌ FAIL (violation count)
+- Tests: ✅ PASS (X/Y) / ❌ FAIL (failures listed)
+
+Keep output concise. Only include error details for failures.</code></pre>
+      </div>
+
+      <h3>Orchestration Flow</h3>
+      <p>The optimal orchestration pattern runs agents in stages, parallelizing where possible:</p>
+      <ol>
+        <li><strong>Explorer</strong> — Research the codebase area (sequential, feeds into planning)</li>
+        <li><strong>Architect</strong> — Design the solution based on exploration findings</li>
+        <li><strong>Implementer + Test Writer</strong> — Execute in parallel (independent tasks)</li>
+        <li><strong>Code Reviewer + Security Auditor</strong> — Review in parallel (independent checks)</li>
+        <li><strong>Primary Agent</strong> — Synthesize feedback, make final adjustments, commit</li>
+      </ol>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span>text</span>
+          <button class="copy-btn">Copy</button>
+        </div>
+        <pre><code>Stage 1 (Sequential):   Explorer → findings
+Stage 2 (Sequential):   Architect → plan (uses findings)
+Stage 3 (Parallel):     Implementer → code    |  Test Writer → tests
+Stage 4 (Parallel):     Code Reviewer → feedback  |  Security Auditor → report
+Stage 5 (Sequential):   Primary Agent → synthesize, fix, commit</code></pre>
+      </div>
+
+      <div class="callout tip">
+        <div class="callout-icon">💡</div>
+        <div class="callout-body">
+          <div class="callout-title">Model Selection Strategy</div>
+          <div class="callout-text">Use <strong>Haiku</strong> for simple command-running tasks (build validation, formatting checks) where speed and cost matter more than reasoning. Use <strong>Sonnet</strong> for code generation and review where good reasoning is needed at reasonable cost. Use <strong>Opus</strong> for deep reasoning tasks (security audits, architecture decisions) where quality is paramount.</div>
+        </div>
+      </div>
+
+      <div class="page-nav">
+        <a href="module-2.html" class="page-nav-btn prev">
+          <span class="nav-btn-arrow">←</span>
+          <div>
+            <div class="nav-btn-label">Previous</div>
+            <div class="nav-btn-title">Skills — Reusable Automation</div>
+          </div>
+        </a>
+        <a href="module-4.html" class="page-nav-btn next">
+          <span class="nav-btn-arrow">→</span>
+          <div>
+            <div class="nav-btn-label">Next</div>
+            <div class="nav-btn-title">Hooks — Guardrails</div>
+          </div>
+        </a>
+      </div>
+    </div>
+  </main>
+</div>
+<script src="../js/main.js"></script>
+</body>
+</html>

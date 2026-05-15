@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Skills — Reusable Automation — Claude for Software Engineers</title>
+  <link rel="stylesheet" href="../css/styles.css">
+</head>
+<body>
+<div class="reading-progress"><div class="progress-fill"></div></div>
+<div class="layout" data-page="module-2">
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <a href="../index.html" class="sidebar-logo">
+        <span class="logo-icon">CC</span>
+        <span class="logo-text">Dev Mastery</span>
+      </a>
+    </div>
+    <div class="sidebar-progress">
+      <div class="progress-bar"><div class="progress-fill" style="width: 0%"></div></div>
+      <span class="progress-label">0/8 complete</span>
+    </div>
+    <nav class="sidebar-nav">
+            <div class="nav-section-label">Course Modules</div>
+      <a href="module-1.html" class="nav-item" data-page="module-1">Foundations &amp; Setup</a>
+      <a href="module-2.html" class="nav-item" data-page="module-2">Skills — Reusable Automation</a>
+      <a href="module-3.html" class="nav-item" data-page="module-3">Subagents — AI Workers</a>
+      <a href="module-4.html" class="nav-item" data-page="module-4">Hooks — Guardrails</a>
+      <a href="module-5.html" class="nav-item" data-page="module-5">Automated Pipeline</a>
+      <a href="module-6.html" class="nav-item" data-page="module-6">Documentation Automation</a>
+      <a href="module-7.html" class="nav-item" data-page="module-7">Advanced Patterns</a>
+      <a href="module-8.html" class="nav-item" data-page="module-8">Certification &amp; Next Steps</a>
+    </nav>
+  </aside>
+
+  <div class="sidebar-overlay"></div>
+
+  <!-- Main Content -->
+  <main class="main">
+    <div class="topbar">
+      <button class="sidebar-toggle">☰</button>
+      <div class="breadcrumb">
+        <a href="../index.html">Home</a> / <span>Module 2: Skills</span>
+      </div>
+    </div>
+    <div class="content">
+
+      <div class="page-header">
+        <span class="page-tag">Module 2</span>
+        <h1 class="page-title">Skills — Reusable Automation</h1>
+        <p class="page-desc">Build reusable prompt templates that auto-trigger based on context, inject live data, and chain into powerful workflows.</p>
+        <div class="page-meta">3 lessons · ~80 minutes · Intermediate</div>
+      </div>
+
+      <!-- Lesson 2-1 -->
+      <h2>Lesson 2-1: Creating Your First Skill</h2>
+      <div class="page-meta">25 min · Hands-on</div>
+
+      <p>A skill is a <code>SKILL.md</code> file with YAML frontmatter and markdown instructions. Skills live in a structured directory and auto-invoke based on their description.</p>
+
+      <h3>File Structure</h3>
+      <div class="code-block">
+        <div class="code-header">
+          <span>text</span>
+          <button class="copy-btn">Copy</button>
+        </div>
+        <pre><code>.claude/skills/
+  summarize-changes/
+    SKILL.md
+  generate-tests/
+    SKILL.md
+    templates/
+      jest-template.md</code></pre>
+      </div>
+
+      <h3>Example: Summarize Changes Skill</h3>
+      <div class="code-block">
+        <div class="code-header">
+          <span>markdown</span>
+          <button class="copy-btn">Copy</button>
+        </div>
+        <pre><code>---
+description: Summarizes uncommitted changes and flags risks.
+  Use when the user asks what changed, wants a commit message,
+  or asks to review their diff.
+---
+## Current changes
+!`git diff HEAD`
+
+## Instructions
+Summarize the changes above in 2-3 bullet points, then list
+any risks: missing error handling, hardcoded values, or tests
+that need updating.</code></pre>
+      </div>
+
+      <h3>Key Concepts</h3>
+      <ul>
+        <li><code>!`command`</code> = dynamic context injection (runs at invocation time)</li>
+        <li><code>description</code> in frontmatter = when to auto-invoke the skill</li>
+        <li>Directory name = <code>/slash-command</code> (e.g., <code>/summarize-changes</code>)</li>
+        <li>Personal skills: <code>~/.claude/skills/</code> (available in all projects)</li>
+        <li>Project skills: <code>.claude/skills/</code> (shared with team via git)</li>
+      </ul>
+
+      <div class="callout tip">
+        <div class="callout-icon">💡</div>
+        <div class="callout-body">
+          <div class="callout-title">Dynamic Context Injection</div>
+          <div class="callout-text">The <code>!`command`</code> syntax is what makes skills powerful. It runs the command at invocation time and injects the output directly into the prompt. Use it for git diffs, file contents, test results, or any live data your skill needs.</div>
+        </div>
+      </div>
+
+      <!-- Lesson 2-2 -->
+      <h2>Lesson 2-2: Production Skills — Code Review, Testing, Commits</h2>
+      <div class="page-meta">30 min · Hands-on</div>
+
+      <p>Let's build three production-ready skills that you'll use daily.</p>
+
+      <h3>1. Auto Code Review</h3>
+      <div class="code-block">
+        <div class="code-header">
+          <span>markdown</span>
+          <button class="copy-btn">Copy</button>
+        </div>
+        <pre><code>---
+description: Reviews staged changes for bugs, security issues,
+  and style violations. Use when the user asks for a code review
+  or before committing changes.
+---
+## Staged Changes
+!`git diff --cached`
+
+## Project Standards
+!`cat CLAUDE.md`
+
+## Review Checklist
+Review the staged changes against project standards. Check for:
+1. **Bugs** — null checks, off-by-one errors, race conditions
+2. **Security** — injection vulnerabilities, exposed secrets, auth gaps
+3. **Performance** — N+1 queries, unnecessary allocations, missing indexes
+4. **Style** — naming conventions, file organization, documentation
+5. **Tests** — are new paths covered? Are edge cases tested?
+
+Output format:
+- 🔴 Critical (must fix before merge)
+- 🟡 Warning (should fix, not blocking)
+- 🟢 Suggestion (nice to have)
+- ✅ Looks good (no issues found)</code></pre>
+      </div>
+
+      <h3>2. Generate Tests</h3>
+      <div class="code-block">
+        <div class="code-header">
+          <span>markdown</span>
+          <button class="copy-btn">Copy</button>
+        </div>
+        <pre><code>---
+description: Generates unit tests for recently changed files.
+  Use when the user asks to write tests, add coverage, or after
+  implementing a new feature.
+---
+## Changed Files
+!`git diff --name-only HEAD~1`
+
+## Existing Test Patterns
+!`find . -name "*.test.*" | head -5 | xargs head -30`
+
+## Instructions
+For each changed source file that lacks test coverage:
+1. Identify the public API (exported functions/classes)
+2. Write tests covering happy path, edge cases, and error cases
+3. Follow the existing test patterns shown above
+4. Place test files next to source files
+5. Use descriptive test names: "should [expected behavior] when [condition]"</code></pre>
+      </div>
+
+      <h3>3. Commit Message Generator</h3>
+      <div class="code-block">
+        <div class="code-header">
+          <span>markdown</span>
+          <button class="copy-btn">Copy</button>
+        </div>
+        <pre><code>---
+description: Generates a conventional commit message from staged changes.
+  Use when the user asks for a commit message or is ready to commit.
+---
+## Staged Changes
+!`git diff --cached --stat`
+
+## Detailed Diff
+!`git diff --cached`
+
+## Instructions
+Generate a commit message following Conventional Commits:
+- type(scope): subject (max 50 chars)
+- blank line
+- body: what changed and why (wrap at 72 chars)
+- blank line
+- footer: breaking changes, issue refs
+
+Types: feat, fix, refactor, docs, test, chore, perf, ci
+Scope: the module or area affected</code></pre>
+      </div>
+
+      <div class="callout checkpoint">
+        <div class="callout-icon">✅</div>
+        <div class="callout-body">
+          <div class="callout-title">Checkpoint</div>
+          <div class="callout-text">Create all three skills in your <code>.claude/skills/</code> directory and test them with real code changes. Make a small edit, stage it, and invoke each skill to verify they work correctly.</div>
+        </div>
+      </div>
+
+      <!-- Lesson 2-3 -->
+      <h2>Lesson 2-3: Chaining Skills into Workflows</h2>
+      <div class="page-meta">25 min · Hands-on</div>
+
+      <p>Individual skills are powerful, but chaining them into workflows creates end-to-end automation. A workflow skill orchestrates multiple steps in sequence.</p>
+
+      <h3>Full Feature Workflow</h3>
+      <div class="code-block">
+        <div class="code-header">
+          <span>markdown</span>
+          <button class="copy-btn">Copy</button>
+        </div>
+        <pre><code>---
+description: Implements a complete feature from exploration to commit.
+  Use when the user describes a feature to build or a task to complete.
+---
+## Project Context
+!`cat CLAUDE.md`
+
+## Current Branch
+!`git branch --show-current`
+
+## Workflow Steps
+
+### Step 1: Explore
+Understand the codebase area relevant to this feature.
+Read related files, understand existing patterns.
+
+### Step 2: Plan
+Create a brief implementation plan:
+- Files to create/modify
+- Key design decisions
+- Edge cases to handle
+
+### Step 3: Implement
+Write the code following project conventions from CLAUDE.md.
+Keep changes minimal and focused.
+
+### Step 4: Test
+Write tests for the new code. Run existing tests to check
+for regressions: !`npm test 2>&amp;1 | tail -20`
+
+### Step 5: Review
+Review your own changes against the project checklist.
+Use /auto-code-review if available.
+
+### Step 6: Commit
+Generate a conventional commit message and commit the changes.
+Use /commit-message if available.</code></pre>
+      </div>
+
+      <h3>Weekly Code Review Report</h3>
+      <div class="code-block">
+        <div class="code-header">
+          <span>markdown</span>
+          <button class="copy-btn">Copy</button>
+        </div>
+        <pre><code>---
+description: Generates a weekly summary of code changes, patterns,
+  and technical debt. Use on Fridays or when the user asks for a
+  weekly report.
+---
+## This Week's Commits
+!`git log --oneline --since="7 days ago"`
+
+## Files Changed This Week
+!`git diff --stat HEAD~$(git rev-list --count --since="7 days ago" HEAD)`
+
+## Instructions
+Generate a weekly report with:
+1. **Summary** — Key features shipped, bugs fixed
+2. **Patterns** — Recurring themes in changes
+3. **Technical Debt** — Areas that need refactoring
+4. **Recommendations** — What to focus on next week</code></pre>
+      </div>
+
+      <h4>Key Insight</h4>
+      <p>Skills can reference other skills and subagents by name. This creates a layered architecture where simple skills compose into complex workflows, and workflows can delegate specialized tasks to subagents.</p>
+
+      <div class="callout tip">
+        <div class="callout-icon">💡</div>
+        <div class="callout-body">
+          <div class="callout-title">The Orchestration Pattern</div>
+          <div class="callout-text">Think of workflow skills as orchestrators. They don't do the deep work themselves — they sequence steps, pass context between them, and delegate specialized tasks. This keeps each piece simple and testable while the workflow handles coordination.</div>
+        </div>
+      </div>
+
+      <div class="page-nav">
+        <a href="module-1.html" class="page-nav-btn prev">
+          <span class="nav-btn-arrow">←</span>
+          <div>
+            <div class="nav-btn-label">Previous</div>
+            <div class="nav-btn-title">Foundations &amp; Setup</div>
+          </div>
+        </a>
+        <a href="module-3.html" class="page-nav-btn next">
+          <span class="nav-btn-arrow">→</span>
+          <div>
+            <div class="nav-btn-label">Next</div>
+            <div class="nav-btn-title">Subagents — AI Workers</div>
+          </div>
+        </a>
+      </div>
+    </div>
+  </main>
+</div>
+<script src="../js/main.js"></script>
+</body>
+</html>

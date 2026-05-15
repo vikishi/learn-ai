@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Advanced Patterns — Claude for Software Engineers</title>
+  <link rel="stylesheet" href="../css/styles.css">
+</head>
+<body>
+<div class="reading-progress"><div class="progress-fill"></div></div>
+<div class="layout" data-page="module-7">
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <a href="../index.html" class="sidebar-logo">
+        <span class="logo-icon">CC</span>
+        <span class="logo-text">Dev Mastery</span>
+      </a>
+    </div>
+    <div class="sidebar-progress">
+      <div class="progress-bar"><div class="progress-fill" style="width: 0%"></div></div>
+      <span class="progress-label">0/8 complete</span>
+    </div>
+    <nav class="sidebar-nav">
+            <div class="nav-section-label">Course Modules</div>
+      <a href="module-1.html" class="nav-item" data-page="module-1">Foundations &amp; Setup</a>
+      <a href="module-2.html" class="nav-item" data-page="module-2">Skills — Reusable Automation</a>
+      <a href="module-3.html" class="nav-item" data-page="module-3">Subagents — AI Workers</a>
+      <a href="module-4.html" class="nav-item" data-page="module-4">Hooks — Guardrails</a>
+      <a href="module-5.html" class="nav-item" data-page="module-5">Automated Pipeline</a>
+      <a href="module-6.html" class="nav-item" data-page="module-6">Documentation Automation</a>
+      <a href="module-7.html" class="nav-item" data-page="module-7">Advanced Patterns</a>
+      <a href="module-8.html" class="nav-item" data-page="module-8">Certification &amp; Next Steps</a>
+    </nav>
+  </aside>
+
+  <div class="sidebar-overlay"></div>
+
+  <!-- Main Content -->
+  <main class="main">
+    <div class="topbar">
+      <button class="sidebar-toggle">☰</button>
+      <div class="breadcrumb">
+        <a href="../index.html">Home</a> / <span>Module 7: Advanced</span>
+      </div>
+    </div>
+    <div class="content">
+
+      <div class="page-header">
+        <span class="page-tag">Module 9</span>
+        <h1 class="page-title">Advanced Patterns</h1>
+        <p class="page-desc">Master headless automation, scheduled pipelines, git worktrees for parallel work, and team-wide scaling of your Claude Code configuration.</p>
+        <div class="page-meta">2 lessons · ~50 minutes · Advanced</div>
+      </div>
+
+      <!-- Lesson 9-1 -->
+      <h2>Lesson 9-1: Headless Mode &amp; Scheduled Automation</h2>
+      <div class="page-meta">25 min · Hands-on</div>
+
+      <p>Headless mode (<code>--print</code> / <code>-p</code>) runs Claude Code non-interactively — perfect for cron jobs, CI pipelines, and automated workflows that don't need human input.</p>
+
+      <h3>1. Daily Code Quality Report</h3>
+      <p>Schedule a daily quality report that runs every weekday morning:</p>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span>bash</span>
+          <button class="copy-btn">Copy</button>
+        </div>
+        <pre><code>#!/bin/bash
+# cron: 0 9 * * 1-5 (9 AM weekdays)
+cd /path/to/project
+
+claude -p "Generate a daily code quality report:
+1. Run the test suite and report coverage
+2. Check for TODO/FIXME/HACK comments added this week
+3. Identify the 5 most complex functions
+4. List any dependency security advisories
+5. Save report to reports/daily/$(date +%Y-%m-%d).md" \
+  --dangerously-skip-permissions</code></pre>
+      </div>
+
+      <h3>2. Weekly Dependency Updates</h3>
+      <p>Automate dependency updates with branch creation, testing, and PR submission:</p>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span>bash</span>
+          <button class="copy-btn">Copy</button>
+        </div>
+        <pre><code>#!/bin/bash
+# cron: 0 10 * * 1 (Monday 10 AM)
+cd /path/to/project
+
+BRANCH="chore/deps-update-$(date +%Y%m%d)"
+git checkout -b "$BRANCH"
+
+claude -p "Update all dependencies:
+1. Run npm outdated and identify safe updates
+2. Update patch and minor versions
+3. Run the full test suite
+4. If tests pass, commit changes
+5. Create a PR with a summary of what was updated
+6. If tests fail, revert and report which packages broke" \
+  --dangerously-skip-permissions</code></pre>
+      </div>
+
+      <h3>3. Git Worktrees for Parallel Work</h3>
+      <p>Use git worktrees to run multiple Claude instances on different features simultaneously:</p>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span>bash</span>
+          <button class="copy-btn">Copy</button>
+        </div>
+        <pre><code># Create a worktree for a feature branch
+git worktree add ../myapp-feature feature-branch
+cd ../myapp-feature
+
+# Run Claude non-interactively in the worktree
+claude -p "implement the user avatar feature based on ticket #123"
+
+# Meanwhile, continue working in main worktree
+# Each worktree gets its own independent Claude instance</code></pre>
+      </div>
+
+      <h4>Additional Access Methods</h4>
+      <ul>
+        <li><strong>Mobile access</strong> — Connect to Claude Code sessions from your phone for monitoring</li>
+        <li><strong>/teleport</strong> — Transfer context between Claude Code sessions seamlessly</li>
+        <li><strong>/remote-control</strong> — Allow another developer to guide your Claude instance</li>
+      </ul>
+
+      <div class="callout warning">
+        <div class="callout-icon">⚠️</div>
+        <div class="callout-body">
+          <div class="callout-title">Use --dangerously-skip-permissions Carefully</div>
+          <div class="callout-text">The <code>--dangerously-skip-permissions</code> flag bypasses all permission checks. Only use it in trusted, isolated environments (CI runners, dedicated automation servers). Always test your automated workflows interactively first before enabling headless mode.</div>
+        </div>
+      </div>
+
+      <!-- Lesson 9-2 -->
+      <h2>Lesson 9-2: Team Scaling: Shared Skills, Agents &amp; Plugins</h2>
+      <div class="page-meta">25 min · Hands-on</div>
+
+      <p>Your Claude Code configuration becomes infrastructure when shared across a team. Here's how to organize it for maximum reuse and discoverability.</p>
+
+      <h3>Recommended .claude/ Directory Structure</h3>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span>text</span>
+          <button class="copy-btn">Copy</button>
+        </div>
+        <pre><code>.claude/
+  CLAUDE.md
+  settings.json
+  agents/
+    code-reviewer.md
+    security-auditor.md
+    test-writer.md
+    build-validator.md
+    codebase-architect.md
+  skills/
+    ship/SKILL.md
+    code-review/SKILL.md
+    generate-tests/SKILL.md
+    commit-message/SKILL.md
+    security-gate/SKILL.md
+    changelog/SKILL.md
+    doc-api/SKILL.md
+    feature-workflow/SKILL.md
+  hooks/
+    block-dangerous.js
+    auto-lint.js
+    audit-log.js</code></pre>
+      </div>
+
+      <h3>New Developer Onboarding Flow</h3>
+      <p>When this structure is committed to your repository, onboarding becomes trivial:</p>
+
+      <ol>
+        <li><strong>Clone the repo</strong> — All configuration comes with it</li>
+        <li><strong>Install Claude Code</strong> — Extension or CLI</li>
+        <li><strong>Get all skills/agents/hooks automatically</strong> — No manual setup needed</li>
+        <li><strong>Run /onboard</strong> — Generate personalized onboarding docs</li>
+        <li><strong>Productive on day one</strong> — Full automation suite from first commit</li>
+      </ol>
+
+      <h3>Personal vs Project Skills</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Location</th>
+            <th>Scope</th>
+            <th>Use Case</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code>.claude/skills/</code></td>
+            <td>Project (shared)</td>
+            <td>Team conventions, project-specific automation</td>
+          </tr>
+          <tr>
+            <td><code>~/.claude/skills/</code></td>
+            <td>Personal (global)</td>
+            <td>Your preferences, cross-project utilities</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>Plugins for Cross-Project Skills</h3>
+      <p>Plugins let you share skills across multiple projects without duplicating files. Package common patterns (like your team's PR template, commit conventions, or deployment checklist) as reusable plugins that any project can reference.</p>
+
+      <div class="callout tip">
+        <div class="callout-icon">💡</div>
+        <div class="callout-body">
+          <div class="callout-title">Interactive Agent Creation</div>
+          <div class="callout-text">Use the <code>/agents</code> command for interactive creation — Claude writes sharper descriptions than most developers. The better the description, the more reliably the agent gets invoked.</div>
+        </div>
+      </div>
+
+      <div class="callout checkpoint">
+        <div class="callout-icon">🎯</div>
+        <div class="callout-body">
+          <div class="callout-title">Checkpoint</div>
+          <div class="callout-text">Organize your <code>.claude/</code> directory following the structure above and commit it to your repository. Verify that a fresh clone picks up all skills and agents.</div>
+        </div>
+      </div>
+
+      <div class="page-nav">
+        <a href="module-6.html" class="page-nav-btn prev">
+          <span class="nav-btn-arrow">←</span>
+          <div>
+            <div class="nav-btn-label">Previous</div>
+            <div class="nav-btn-title">Documentation Automation</div>
+          </div>
+        </a>
+        <a href="module-8.html" class="page-nav-btn next">
+          <span class="nav-btn-arrow">→</span>
+          <div>
+            <div class="nav-btn-label">Next</div>
+            <div class="nav-btn-title">Certification &amp; Next Steps</div>
+          </div>
+        </a>
+      </div>
+    </div>
+  </main>
+</div>
+<script src="../js/main.js"></script>
+</body>
+</html>
