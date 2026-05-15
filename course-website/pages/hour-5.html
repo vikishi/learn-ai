@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hour 5: Workflow Integration — Building AI Code Reviewers with Claude</title>
+  <link rel="stylesheet" href="../css/styles.css">
+</head>
+<body>
+<div class="layout">
+<aside class="sidebar">
+  <div class="sidebar-header">
+    <a href="../index.html" class="sidebar-logo">
+      <div class="sidebar-logo-icon"><svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg></div>
+      <div><div class="sidebar-logo-text">AI Code Reviewers</div><span class="sidebar-logo-sub">with Claude Subagents</span></div>
+    </a>
+    <div class="progress-wrap"><div class="progress-bar"><div class="progress-fill" style="width: 0%"></div></div><span class="progress-label">0%</span></div>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-section"><div class="nav-section-label">Getting Started</div><a href="prerequisites.html" class="nav-item" data-page="prerequisites">Prerequisites</a></div>
+    <div class="nav-section"><div class="nav-section-label">Core Modules</div>
+      <a href="hour-1.html" class="nav-item" data-page="hour-1">Hour 1: Subagent Fundamentals</a>
+      <a href="hour-2.html" class="nav-item" data-page="hour-2">Hour 2: Code Reviewer</a>
+      <a href="hour-3.html" class="nav-item" data-page="hour-3">Hour 3: Specialized Subagents</a>
+    </div>
+    <div class="nav-section"><div class="nav-section-label">Advanced</div>
+      <a href="hour-4.html" class="nav-item" data-page="hour-4">Hour 4: Advanced Patterns</a>
+      <a href="hour-5.html" class="nav-item active" data-page="hour-5">Hour 5: Workflow Integration</a>
+      <a href="hour-6.html" class="nav-item" data-page="hour-6">Hour 6: Optimization</a>
+    </div>
+    <div class="nav-section"><div class="nav-section-label">Resources</div><a href="resources.html" class="nav-item" data-page="resources">Templates & Reference</a></div>
+  </nav>
+</aside>
+<main class="main">
+  <div class="topbar">
+    <button class="topbar-mobile-toggle"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg></button>
+    <div class="breadcrumb"><a href="../index.html">Home</a><span class="sep">/</span><span class="current">Hour 5</span></div>
+  </div>
+  <div class="content">
+    <header class="page-header">
+      <div class="page-tag">🔄 Hour 5</div>
+      <h1 class="page-title">Workflow Integration</h1>
+      <p class="page-desc">Build a pre-commit review flow, repository-wide auditor, and domain-specific reviewers for your daily workflow.</p>
+      <div class="page-meta">
+        <div class="meta-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg> 60 min</div>
+        <div class="meta-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg> Integration</div>
+      </div>
+    </header>
+
+    <h2>Part 1: Pre-Commit Review Flow (20 min)</h2>
+    <h3>Daily Development Flow</h3>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">text</span><button class="copy-btn"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copy</button></div>
+      <pre><code>1. Write code
+   ↓
+2. "Review auth.py" (code-reviewer)
+   ↓
+3. Fix issues found
+   ↓
+4. "Pre-commit check auth.py" (quick validation)
+   ↓
+5. Commit if approved
+   ↓
+6. Continue coding</code></pre>
+    </div>
+
+    <h3>Quick Commands</h3>
+    <table>
+      <thead><tr><th>Command</th><th>What It Does</th></tr></thead>
+      <tbody>
+        <tr><td><code>"Pre-commit check [file]"</code></td><td>Security (critical only) + bugs + test verification → Go/No-Go</td></tr>
+        <tr><td><code>"Full review of [file]"</code></td><td>Complete security + code review + tests + refactoring</td></tr>
+        <tr><td><code>"Quick security and bug check"</code></td><td>Fast scan, skip refactoring and style</td></tr>
+        <tr><td><code>"Is this ready for PR?"</code></td><td>Security + review + verify tests pass + team standards check</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Before Creating a PR</h3>
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">text</span><button class="copy-btn"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copy</button></div>
+      <pre><code>1. "Full review on all changed files"
+   ↓
+2. Address critical issues
+   ↓
+3. "Generate tests for uncovered code"
+   ↓
+4. Run full test suite
+   ↓
+5. Create PR with confidence</code></pre>
+    </div>
+
+    <h2>Part 2: Repository-Wide Analysis (20 min)</h2>
+    <p>Create <code>.claude/agents/codebase-auditor.md</code>:</p>
+
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">markdown</span><button class="copy-btn"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copy</button></div>
+      <pre><code>---
+name: codebase-auditor
+description: Audits entire repositories for hotspots, test coverage gaps, dependency vulnerabilities, and technical debt
+tools: Read, Bash, Grep, Glob
+---
+
+# Codebase Auditor Subagent
+
+You analyze entire repositories for patterns, issues, and technical debt.
+
+## Analysis Steps
+
+### 1. Repository Overview
+- Total files, lines of code, commits
+- Top contributors, repository age
+
+### 2. Identify Hotspots
+- Most changed files (high churn = likely bugs)
+- Largest files (may need splitting)
+- Complex files (deep nesting, many branches)
+
+### 3. Test Coverage
+- Overall percentage vs. target
+- Untested critical paths
+- Missing edge case coverage
+
+### 4. Dependency Health
+- Outdated packages
+- Known security vulnerabilities (pip-audit, npm audit)
+- Deprecated dependencies
+
+### 5. Code Quality Patterns
+- TODOs/FIXMEs count
+- Hardcoded values
+- Large files (>500 lines)
+- Duplicated code patterns
+
+### 6. Output Report
+```
+# Codebase Audit Report
+
+## Overview (stats)
+## Hotspots (high-churn files)
+## Test Coverage (gaps)
+## Dependencies (vulnerabilities)
+## Technical Debt (TODOs, large files)
+## Security Concerns
+## Recommendations
+  - Immediate (this week)
+  - Short Term (this month)
+  - Long Term (this quarter)
+## Risk Assessment
+```
+
+Run this audit monthly to track improvements.</code></pre>
+    </div>
+
+    <h2>Part 3: Domain-Specific Reviewers (20 min)</h2>
+    <p>Build reviewers for your specific work domain. Example — <strong>API Reviewer</strong>:</p>
+
+    <div class="code-block">
+      <div class="code-header"><span class="code-lang">markdown</span><button class="copy-btn"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copy</button></div>
+      <pre><code>---
+name: api-reviewer
+description: Reviews REST API code for correct HTTP status codes, input validation, auth checks, and consistent response format
+tools: Read, Bash, Grep, Glob
+---
+
+# API Development Reviewer
+
+## Checks
+- Correct HTTP status codes (200, 201, 400, 401, 403, 404, 500)
+- Input validation on all endpoints
+- Authentication on all non-public endpoints
+- Authorization (user owns the resource?)
+- Consistent response format
+- Rate limiting on write endpoints
+- API versioning
+- Documentation (OpenAPI/Swagger)</code></pre>
+    </div>
+
+    <p>Other domain reviewers you might build:</p>
+    <ul>
+      <li><strong>Frontend Reviewer</strong> — React hooks, accessibility, performance</li>
+      <li><strong>Database Reviewer</strong> — Query optimization, migrations, indexes</li>
+      <li><strong>DevOps Reviewer</strong> — Dockerfile, CI/CD pipelines, infrastructure</li>
+    </ul>
+
+    <div class="callout tip">
+      <div class="callout-icon">💡</div>
+      <div class="callout-body">
+        <div class="callout-title">Build What You Need</div>
+        <p class="callout-text">The most valuable reviewer is one tailored to YOUR biggest pain points. What type of bugs do you ship most often?</p>
+      </div>
+    </div>
+
+    <div class="callout checkpoint">
+      <div class="callout-icon">✓</div>
+      <div class="callout-body">
+        <div class="callout-title">Hour 5 Complete</div>
+        <p class="callout-text">You now have a complete workflow: pre-commit checks, full reviews, repository audits, and domain-specific reviewers integrated into your daily development.</p>
+      </div>
+    </div>    <div class="page-nav">
+      <a href="hour-4.html" class="page-nav-btn prev">
+        <span class="nav-btn-arrow">←</span>
+        <div>
+          <div class="nav-btn-label">Previous</div>
+          <div class="nav-btn-title">Hour 4: Advanced Patterns</div>
+        </div>
+      </a>
+      <a href="hour-6.html" class="page-nav-btn next">
+        <span class="nav-btn-arrow">→</span>
+        <div>
+          <div class="nav-btn-label">Next</div>
+          <div class="nav-btn-title">Hour 6: Optimization</div>
+        </div>
+      </a>
+    </div>
+  </div>
+</main>
+</div>
+<div class="sidebar-overlay"></div>
+<script src="../js/main.js"></script>
+</body>
+</html>

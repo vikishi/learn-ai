@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Prerequisites — Building AI Code Reviewers with Claude</title>
+  <link rel="stylesheet" href="../css/styles.css">
+</head>
+<body>
+<div class="layout">
+<aside class="sidebar">
+  <div class="sidebar-header">
+    <a href="../index.html" class="sidebar-logo">
+      <div class="sidebar-logo-icon">
+        <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+      </div>
+      <div>
+        <div class="sidebar-logo-text">AI Code Reviewers</div>
+        <span class="sidebar-logo-sub">with Claude Subagents</span>
+      </div>
+    </a>
+    <div class="progress-wrap">
+      <div class="progress-bar"><div class="progress-fill" style="width: 0%"></div></div>
+      <span class="progress-label">0%</span>
+    </div>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-section">
+      <div class="nav-section-label">Getting Started</div>
+      <a href="prerequisites.html" class="nav-item active" data-page="prerequisites">Prerequisites</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-label">Core Modules</div>
+      <a href="hour-1.html" class="nav-item" data-page="hour-1">Hour 1: Subagent Fundamentals</a>
+      <a href="hour-2.html" class="nav-item" data-page="hour-2">Hour 2: Code Reviewer</a>
+      <a href="hour-3.html" class="nav-item" data-page="hour-3">Hour 3: Specialized Subagents</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-label">Advanced</div>
+      <a href="hour-4.html" class="nav-item" data-page="hour-4">Hour 4: Advanced Patterns</a>
+      <a href="hour-5.html" class="nav-item" data-page="hour-5">Hour 5: Workflow Integration</a>
+      <a href="hour-6.html" class="nav-item" data-page="hour-6">Hour 6: Optimization</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-label">Resources</div>
+      <a href="resources.html" class="nav-item" data-page="resources">Templates & Reference</a>
+    </div>
+  </nav>
+</aside>
+<main class="main">
+  <div class="topbar">
+    <button class="topbar-mobile-toggle">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+    </button>
+    <div class="breadcrumb">
+      <a href="../index.html">Home</a>
+      <span class="sep">/</span>
+      <span class="current">Prerequisites</span>
+    </div>
+  </div>
+  <div class="content">
+    <header class="page-header">
+      <div class="page-tag">🛠️ Setup</div>
+      <h1 class="page-title">Prerequisites & Setup</h1>
+      <p class="page-desc">Get your environment ready for building AI code reviewers. This should take about 15 minutes.</p>
+      <div class="page-meta">
+        <div class="meta-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+          15 min
+        </div>
+      </div>
+    </header>
+
+    <h2>Required Tools</h2>
+    <h3>Claude Code</h3>
+    <p>You need Claude Code with an active subscription (Pro, Teams, or Enterprise). Verify installation:</p>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">bash</span>
+        <button class="copy-btn"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copy</button>
+      </div>
+      <pre><code># Verify Claude Code is installed
+claude --version
+
+# Create the agents directory
+cd your-project
+mkdir -p .claude/agents
+echo "Setup complete!"</code></pre>
+    </div>
+
+    <h3>Git and Command Line</h3>
+    <p>You should be comfortable with:</p>
+    <ul>
+      <li>Basic Git commands (<code>git add</code>, <code>git commit</code>, <code>git diff</code>)</li>
+      <li>Navigating directories in a terminal</li>
+      <li>Running shell commands</li>
+    </ul>
+
+    <h3>A Code Project to Practice On</h3>
+    <p>Have a real project with at least a few hundred lines of code. The subagents you build will review this code, so pick something you know well.</p>
+
+    <div class="callout tip">
+      <div class="callout-icon">💡</div>
+      <div class="callout-body">
+        <div class="callout-title">Use a Project You Know</div>
+        <p class="callout-text">Testing code reviewers on familiar code helps you evaluate whether they're catching real issues or generating noise.</p>
+      </div>
+    </div>
+
+    <h2>Recommended Setup</h2>
+    <ul>
+      <li><strong>VS Code</strong> with Claude Code extension for inline suggestions</li>
+      <li><strong>GitHub account</strong> for testing with real repos and PRs</li>
+      <li>Basic understanding of code review principles</li>
+    </ul>
+
+    <h2>Course Materials Location</h2>
+    <p>All agent files will be created in <code>.claude/agents/</code> within your project:</p>
+    <div class="code-block">
+      <div class="code-header">
+        <span class="code-lang">text</span>
+        <button class="copy-btn"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copy</button>
+      </div>
+      <pre><code>your-project/
+├── .claude/
+│   └── agents/
+│       ├── bug-finder.md
+│       ├── code-reviewer.md
+│       ├── security-scanner.md
+│       └── test-generator.md
+├── src/
+└── tests/</code></pre>
+    </div>
+
+    <h2>Course Structure</h2>
+    <table>
+      <thead><tr><th>Track</th><th>Duration</th><th>Approach</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Intensive</strong></td><td>1 day</td><td>Complete all 6 hours in one session</td></tr>
+        <tr><td><strong>Relaxed</strong></td><td>2-3 days</td><td>2-3 hours per day with breaks</td></tr>
+        <tr><td><strong>Self-Paced</strong></td><td>1-2 weeks</td><td>One hour per session, lots of experimentation</td></tr>
+      </tbody>
+    </table>
+
+    <div class="callout checkpoint">
+      <div class="callout-icon">✓</div>
+      <div class="callout-body">
+        <div class="callout-title">Setup Complete</div>
+        <p class="callout-text">If <code>claude --version</code> runs without errors and you have a project ready, you're good to start Hour 1!</p>
+      </div>
+    </div>
+      <div class="page-nav">
+      <a href="hour-1.html" class="page-nav-btn next">
+        <span class="nav-btn-arrow">→</span>
+        <div>
+          <div class="nav-btn-label">Next</div>
+          <div class="nav-btn-title">Hour 1: Subagent Fundamentals</div>
+        </div>
+      </a>
+    </div>
+  </div>
+</main>
+</div>
+<div class="sidebar-overlay"></div>
+<script src="../js/main.js"></script>
+</body>
+</html>
