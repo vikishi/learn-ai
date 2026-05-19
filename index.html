@@ -3,21 +3,124 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Claude for Software Engineers</title>
+  <title>Claude Code Learning Path</title>
   <link rel="stylesheet" href="css/styles.css">
   <style>
     body { background: var(--content-bg); }
-    .landing-title span { color: #d4a017; }
     .landing-badge { border-color: #d4a017; color: #d4a017; }
+    .landing-title span { color: #d4a017; }
     .stat-number { color: #d4a017; }
-    .build-num { background: #d4a017; }
-    .philosophy-pct { color: #d4a017; }
     .section-label { color: #d4a017; }
-    .module-icon { color: #d4a017; }
-    .module-arrow { color: #d4a017; }
     .check-icon.done { color: #d4a017; }
-    .btn-primary { background: #d4a017; border-color: #d4a017; }
-    .btn-primary:hover { background: #b8860b; border-color: #b8860b; }
+
+    /* Course catalog cards */
+    .course-catalog {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    .course-catalog-card {
+      display: flex;
+      flex-direction: column;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 28px;
+      background: var(--card-bg);
+      text-decoration: none;
+      color: inherit;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+    .course-catalog-card:hover {
+      box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    }
+    .course-catalog-card.gold { border-top: 3px solid #d4a017; }
+    .course-catalog-card.gold:hover { border-color: #d4a017; }
+    .course-catalog-card.teal { border-top: 3px solid #0891b2; }
+    .course-catalog-card.teal:hover { border-color: #0891b2; }
+
+    .catalog-tag {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 3px 8px;
+      border-radius: 4px;
+      margin-bottom: 14px;
+    }
+    .catalog-tag.gold { background: rgba(212,160,23,0.12); color: #d4a017; }
+    .catalog-tag.teal { background: rgba(8,145,178,0.12); color: #0891b2; }
+
+    .catalog-title {
+      font-size: 20px;
+      font-weight: 700;
+      margin: 0 0 10px;
+      color: var(--text-primary);
+      line-height: 1.3;
+    }
+    .catalog-desc {
+      font-size: 14px;
+      color: var(--text-secondary);
+      line-height: 1.6;
+      margin: 0 0 20px;
+      flex: 1;
+    }
+    .catalog-stats {
+      display: flex;
+      gap: 16px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+    .catalog-stat {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+    .catalog-stat strong {
+      color: var(--text-primary);
+      font-weight: 600;
+    }
+    .catalog-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 10px 18px;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 600;
+      text-decoration: none;
+      width: fit-content;
+    }
+    .catalog-btn.gold { background: #d4a017; color: #000; }
+    .catalog-btn.gold:hover { background: #b8860b; }
+    .catalog-btn.teal { background: #0891b2; color: #fff; }
+    .catalog-btn.teal:hover { background: #0e7490; }
+
+    .course-section-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 8px;
+    }
+    .course-section-pill {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 4px 10px;
+      border-radius: 20px;
+    }
+    .course-section-pill.gold { background: rgba(212,160,23,0.12); color: #d4a017; }
+    .course-section-pill.teal { background: rgba(8,145,178,0.12); color: #0891b2; }
+
+    /* Override module-arrow for teal course */
+    .teal-course .module-arrow { color: #0891b2; }
+    .teal-course .module-icon { color: #0891b2; }
+
+    @media (max-width: 640px) {
+      .course-catalog { grid-template-columns: 1fr; }
+    }
   </style>
 </head>
 <body class="landing-body">
@@ -26,131 +129,108 @@
 <header class="landing-header">
   <div class="landing-badge">
     <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
-    Claude Code · 8-Module Mastery Course
+    Claude Code · Learning Path · 2 Courses
   </div>
   <h1 class="landing-title">
-    <span>Claude</span> for<br>Software Engineers
+    <span>Claude Code</span><br>Learning Path
   </h1>
   <p class="landing-subtitle">
-    Automate Your Entire Dev Workflow — Skills, Subagents, Hooks &amp; CI/CD.
-    Master every extensibility surface of Claude Code and ship faster with AI-native tooling.
+    Two focused courses that take you from Claude Code power user to building
+    custom MCP integrations — fully hands-on, production-ready at every step.
   </p>
   <div class="landing-cta">
     <a href="pages/module-1.html" class="btn-primary">
-      Start Course
+      Start from Beginning
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
     </a>
-    <a href="#curriculum" class="btn-secondary">View Curriculum</a>
+    <a href="#courses" class="btn-secondary">Browse Courses</a>
   </div>
 </header>
 
-<!-- ── Stats ──────────────────────────────────────────────── -->
+<!-- ── Combined Stats ─────────────────────────────────────── -->
 <div class="landing-stats">
   <div class="stat-item">
-    <div class="stat-number">8</div>
-    <div class="stat-label">Modules</div>
+    <div class="stat-number" style="color:#d4a017;">12</div>
+    <div class="stat-label">Total Modules</div>
   </div>
   <div class="stat-item">
-    <div class="stat-number">20</div>
+    <div class="stat-number" style="color:#d4a017;">28</div>
     <div class="stat-label">Lessons</div>
   </div>
   <div class="stat-item">
-    <div class="stat-number">~10</div>
+    <div class="stat-number" style="color:#d4a017;">~13.5</div>
     <div class="stat-label">Hours of content</div>
   </div>
   <div class="stat-item">
-    <div class="stat-number">20+</div>
-    <div class="stat-label">Copy-paste configs</div>
+    <div class="stat-number" style="color:#d4a017;">2</div>
+    <div class="stat-label">Courses</div>
   </div>
 </div>
 
-<!-- ── What You'll Build ──────────────────────────────────── -->
-<section class="landing-section">
-  <div class="section-label">What You'll Build</div>
-  <h2 class="section-title">8 Production-Ready Automation Systems</h2>
+<!-- ── Course Catalog ─────────────────────────────────────── -->
+<section class="landing-section" id="courses">
+  <div class="section-label">Courses</div>
+  <h2 class="section-title">Choose Where to Start</h2>
   <p class="section-desc">
-    By the end of the course you'll have a complete AI-powered development pipeline
-    you can deploy immediately across all your projects.
+    Start with Course 1 if you're new to Claude Code. Jump to Course 2 if you've
+    already mastered the basics and want to connect Claude to your internal tools.
   </p>
 
-  <div class="build-grid">
-    <div class="build-item">
-      <div class="build-num">1</div>
-      <span class="build-name">Custom Skills</span>
+  <div class="course-catalog">
+    <!-- Course 1 -->
+    <div class="course-catalog-card gold">
+      <span class="catalog-tag gold">Course 1 · Start Here</span>
+      <h3 class="catalog-title">Claude for Software Engineers</h3>
+      <p class="catalog-desc">Master every extensibility layer of Claude Code — skills, subagents, hooks, and automated pipelines. Build a complete AI-native dev workflow from scratch.</p>
+      <div class="catalog-stats">
+        <span class="catalog-stat"><strong>8</strong> modules</span>
+        <span class="catalog-stat"><strong>20</strong> lessons</span>
+        <span class="catalog-stat"><strong>~10 hours</strong></span>
+        <span class="catalog-stat"><strong>Beginner → Advanced</strong></span>
+      </div>
+      <a href="pages/module-1.html" class="catalog-btn gold">
+        Start Course 1
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </a>
     </div>
-    <div class="build-item">
-      <div class="build-num">2</div>
-      <span class="build-name">Subagents</span>
-    </div>
-    <div class="build-item">
-      <div class="build-num">3</div>
-      <span class="build-name">Hooks</span>
-    </div>
-    <div class="build-item">
-      <div class="build-num">4</div>
-      <span class="build-name">CI/CD Pipeline</span>
-    </div>
-    <div class="build-item">
-      <div class="build-num">5</div>
-      <span class="build-name">Security Gate</span>
-    </div>
-    <div class="build-item">
-      <div class="build-num">6</div>
-      <span class="build-name">Agent Templates</span>
-    </div>
-    <div class="build-item">
-      <div class="build-num">7</div>
-      <span class="build-name">Auto-Documentation</span>
-    </div>
-    <div class="build-item">
-      <div class="build-num">8</div>
-      <span class="build-name">Team Workflow</span>
+
+    <!-- Course 2 -->
+    <div class="course-catalog-card teal">
+      <span class="catalog-tag teal">Course 2 · After Course 1</span>
+      <h3 class="catalog-title">Introduction to MCP</h3>
+      <p class="catalog-desc">Connect Claude to private internal systems — APIs, databases, Jira — that URL fetching can't reach. Build write-back actions and deploy your server to the whole team.</p>
+      <div class="catalog-stats">
+        <span class="catalog-stat"><strong>4</strong> modules</span>
+        <span class="catalog-stat"><strong>8</strong> lessons</span>
+        <span class="catalog-stat"><strong>~3.5 hours</strong></span>
+        <span class="catalog-stat"><strong>Intermediate → Advanced</strong></span>
+      </div>
+      <a href="mcp/index.html" class="catalog-btn teal">
+        Start Course 2
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </a>
     </div>
   </div>
 </section>
 
-<!-- ── Philosophy ─────────────────────────────────────────── -->
-<section class="landing-section" style="background: var(--border-light); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);">
-  <div class="section-label">Course Philosophy</div>
-  <h2 class="section-title">Learn by Building</h2>
-  <p class="section-desc">
-    This is a workshop, not a lecture. Every module delivers working configurations you can use on real projects immediately.
-  </p>
-
-  <div class="philosophy-grid">
-    <div class="philosophy-card">
-      <div class="philosophy-pct">70%</div>
-      <div class="philosophy-label">Hands-On Practice</div>
-      <div class="philosophy-desc">Building skills, subagents, hooks, and pipelines on real codebases with copy-paste configurations.</div>
-    </div>
-    <div class="philosophy-card">
-      <div class="philosophy-pct">30%</div>
-      <div class="philosophy-label">Core Concepts</div>
-      <div class="philosophy-desc">Architecture principles, extensibility patterns, and best practices for AI-native development.</div>
-    </div>
-    <div class="philosophy-card">
-      <div class="philosophy-pct">3</div>
-      <div class="philosophy-label">Flexible Tracks</div>
-      <div class="philosophy-desc">Intensive (2–3 days), Relaxed (1–2 weeks), or Self-Paced (your own schedule).</div>
-    </div>
+<!-- ── Course 1 Curriculum ────────────────────────────────── -->
+<section class="landing-section" id="curriculum" style="background: var(--border-light); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border);">
+  <div class="course-section-header">
+    <div class="section-label" style="margin: 0;">Curriculum</div>
+    <span class="course-section-pill gold">Course 1</span>
   </div>
-</section>
-
-<!-- ── Curriculum ──────────────────────────────────────────── -->
-<section class="landing-section" id="curriculum">
-  <div class="section-label">Curriculum</div>
-  <h2 class="section-title">Eight Modules, One Complete Toolkit</h2>
+  <h2 class="section-title">Claude for Software Engineers — Eight Modules</h2>
   <p class="section-desc">Each module builds on the last, leaving you with production-ready automation at every checkpoint.</p>
 
   <div class="module-grid">
     <a href="pages/module-1.html" class="module-card">
       <div class="module-icon">🎯</div>
       <div class="module-hour">Module 1</div>
-      <div class="module-title">Foundations & Setup</div>
+      <div class="module-title">Foundations &amp; Setup</div>
       <div class="module-desc">Install Claude Code, configure CLAUDE.md, and understand the extensibility stack.</div>
       <div class="module-footer">
         <span class="module-time">⏱ 60 min · 3 lessons</span>
-        <span class="module-arrow">→</span>
+        <span class="module-arrow" style="color:#d4a017;">→</span>
       </div>
     </a>
 
@@ -161,7 +241,7 @@
       <div class="module-desc">Build custom skills that auto-trigger, chain together, and eliminate repetitive prompting.</div>
       <div class="module-footer">
         <span class="module-time">⏱ 80 min · 3 lessons</span>
-        <span class="module-arrow">→</span>
+        <span class="module-arrow" style="color:#d4a017;">→</span>
       </div>
     </a>
 
@@ -172,7 +252,7 @@
       <div class="module-desc">Create specialized agents for code review, security, testing, and architecture.</div>
       <div class="module-footer">
         <span class="module-time">⏱ 85 min · 3 lessons</span>
-        <span class="module-arrow">→</span>
+        <span class="module-arrow" style="color:#d4a017;">→</span>
       </div>
     </a>
 
@@ -183,7 +263,7 @@
       <div class="module-desc">Enforce rules that the model can't forget: block dangerous commands, auto-lint, audit everything.</div>
       <div class="module-footer">
         <span class="module-time">⏱ 55 min · 2 lessons</span>
-        <span class="module-arrow">→</span>
+        <span class="module-arrow" style="color:#d4a017;">→</span>
       </div>
     </a>
 
@@ -194,7 +274,7 @@
       <div class="module-desc">Write → Review → Test → Lint → Commit → Push — all automated with Claude Code.</div>
       <div class="module-footer">
         <span class="module-time">⏱ 90 min · 3 lessons</span>
-        <span class="module-arrow">→</span>
+        <span class="module-arrow" style="color:#d4a017;">→</span>
       </div>
     </a>
 
@@ -205,7 +285,7 @@
       <div class="module-desc">Auto-generate API docs, READMEs, changelogs, and onboarding guides.</div>
       <div class="module-footer">
         <span class="module-time">⏱ 25 min · 1 lesson</span>
-        <span class="module-arrow">→</span>
+        <span class="module-arrow" style="color:#d4a017;">→</span>
       </div>
     </a>
 
@@ -216,59 +296,123 @@
       <div class="module-desc">Headless mode, worktrees, multi-repo workflows, and team scaling.</div>
       <div class="module-footer">
         <span class="module-time">⏱ 50 min · 2 lessons</span>
-        <span class="module-arrow">→</span>
+        <span class="module-arrow" style="color:#d4a017;">→</span>
       </div>
     </a>
 
     <a href="pages/module-8.html" class="module-card">
       <div class="module-icon">🎓</div>
       <div class="module-hour">Module 8</div>
-      <div class="module-title">Certification & Next Steps</div>
+      <div class="module-title">Certification &amp; Next Steps</div>
       <div class="module-desc">Get certified, build your portfolio, and keep learning.</div>
       <div class="module-footer">
         <span class="module-time">⏱ 15 min · 1 lesson</span>
-        <span class="module-arrow">→</span>
+        <span class="module-arrow" style="color:#d4a017;">→</span>
       </div>
     </a>
   </div>
 </section>
 
-<!-- ── Prerequisites Quick List ─────────────────────────────── -->
-<section class="landing-section" style="padding-top: 0;">
+<!-- ── Course 2 Curriculum ────────────────────────────────── -->
+<section class="landing-section teal-course">
+  <div class="course-section-header">
+    <div class="section-label" style="margin: 0; color: #0891b2;">Curriculum</div>
+    <span class="course-section-pill teal">Course 2</span>
+  </div>
+  <h2 class="section-title">Introduction to MCP — Four Modules</h2>
+  <p class="section-desc">Connect Claude to the tools your team actually uses. Best taken after completing Course 1 modules 1–5.</p>
+
+  <div class="module-grid">
+    <a href="mcp/pages/module-1.html" class="module-card">
+      <div class="module-icon" style="color:#0891b2;">🔌</div>
+      <div class="module-hour">Module 1</div>
+      <div class="module-title">What MCP Is &amp; When You Need It</div>
+      <div class="module-desc">The three primitives, how the protocol works, and when MCP beats plain URL fetching.</div>
+      <div class="module-footer">
+        <span class="module-time">⏱ 45 min · 2 lessons</span>
+        <span class="module-arrow" style="color:#0891b2;">→</span>
+      </div>
+    </a>
+
+    <a href="mcp/pages/module-2.html" class="module-card">
+      <div class="module-icon" style="color:#0891b2;">🔗</div>
+      <div class="module-hour">Module 2</div>
+      <div class="module-title">Connecting to Existing Servers</div>
+      <div class="module-desc">Add GitHub, Postgres, Sentry, and Linear to Claude Code and share config via .mcp.json.</div>
+      <div class="module-footer">
+        <span class="module-time">⏱ 40 min · 2 lessons</span>
+        <span class="module-arrow" style="color:#0891b2;">→</span>
+      </div>
+    </a>
+
+    <a href="mcp/pages/module-3.html" class="module-card">
+      <div class="module-icon" style="color:#0891b2;">🛠️</div>
+      <div class="module-hour">Module 3</div>
+      <div class="module-title">Building Your First MCP Server</div>
+      <div class="module-desc">Scaffold a Node.js server, expose a Tool and Resource, connect it to Claude Code.</div>
+      <div class="module-footer">
+        <span class="module-time">⏱ 60 min · 2 lessons</span>
+        <span class="module-arrow" style="color:#0891b2;">→</span>
+      </div>
+    </a>
+
+    <a href="mcp/pages/module-4.html" class="module-card">
+      <div class="module-icon" style="color:#0891b2;">🏗️</div>
+      <div class="module-hour">Module 4</div>
+      <div class="module-title">Private Systems &amp; Write-Back</div>
+      <div class="module-desc">Connect internal APIs and databases. Add write-back actions. Deploy for your team.</div>
+      <div class="module-footer">
+        <span class="module-time">⏱ 50 min · 2 lessons</span>
+        <span class="module-arrow" style="color:#0891b2;">→</span>
+      </div>
+    </a>
+  </div>
+
+  <div style="margin-top: 28px;">
+    <a href="mcp/index.html" class="btn-secondary">View MCP Course Details →</a>
+  </div>
+</section>
+
+<!-- ── Prerequisites ─────────────────────────────────────── -->
+<section class="landing-section" style="background: var(--border-light); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); padding-top: 48px;">
   <div class="section-label">Before You Start</div>
   <h2 class="section-title">Prerequisites</h2>
 
-  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; max-width: 640px;">
+  <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 32px; max-width: 720px;">
     <div>
-      <h4 style="margin-bottom: 12px; font-size: 13px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em;">Required</h4>
-      <ul class="checklist">
-        <li><span class="check-icon done">✓</span> Claude Code (Pro/Teams/Enterprise)</li>
-        <li><span class="check-icon done">✓</span> Git and command-line basics</li>
-        <li><span class="check-icon done">✓</span> Programming experience</li>
-        <li><span class="check-icon done">✓</span> A project to practice on</li>
+      <h4 style="margin-bottom: 4px; font-size: 13px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em;">Course 1</h4>
+      <ul class="checklist" style="margin-top: 12px;">
+        <li><span class="check-icon done" style="color:#d4a017;">✓</span> Claude Code (Pro/Teams/Enterprise)</li>
+        <li><span class="check-icon done" style="color:#d4a017;">✓</span> Git and command-line basics</li>
+        <li><span class="check-icon done" style="color:#d4a017;">✓</span> Programming experience</li>
+        <li><span class="check-icon done" style="color:#d4a017;">✓</span> A project to practice on</li>
       </ul>
     </div>
     <div>
-      <h4 style="margin-bottom: 12px; font-size: 13px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em;">Recommended</h4>
-      <ul class="checklist">
-        <li><span class="check-icon todo"></span> VS Code with Claude Code extension</li>
-        <li><span class="check-icon todo"></span> GitHub account</li>
-        <li><span class="check-icon todo"></span> Node.js project</li>
+      <h4 style="margin-bottom: 4px; font-size: 13px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em;">Course 2 (additional)</h4>
+      <ul class="checklist" style="margin-top: 12px;">
+        <li><span class="check-icon done" style="color:#0891b2;">✓</span> Complete Course 1 modules 1–5</li>
+        <li><span class="check-icon done" style="color:#0891b2;">✓</span> Node.js 18+</li>
+        <li><span class="check-icon todo"></span> An internal tool you want to connect</li>
+        <li><span class="check-icon todo"></span> TypeScript familiarity</li>
       </ul>
     </div>
   </div>
 
-  <div style="margin-top: 36px;">
-    <a href="pages/module-1.html" class="btn-primary" style="display: inline-flex;">
-      Begin Course
+  <div style="margin-top: 36px; display: flex; gap: 12px; flex-wrap: wrap;">
+    <a href="pages/module-1.html" class="btn-primary" style="display: inline-flex; background:#d4a017; border-color:#d4a017;">
+      Start Course 1
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+    </a>
+    <a href="mcp/index.html" class="btn-secondary" style="display: inline-flex;">
+      Start Course 2 →
     </a>
   </div>
 </section>
 
 <!-- ── Footer ─────────────────────────────────────────────── -->
 <footer class="landing-footer">
-  <span class="footer-text">Claude for Software Engineers · Version 1.0 · 2025</span>
+  <span class="footer-text">Claude Code Learning Path · 2 Courses · Version 1.0 · 2025</span>
   <span class="footer-text">Built for the <a href="pages/module-1.html" class="footer-link">Claude Code</a> platform</span>
 </footer>
 
