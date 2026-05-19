@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Connecting to Existing Servers — Introduction to MCP</title>
+  <link rel="stylesheet" href="../../css/styles.css">
+</head>
+<body>
+<div class="reading-progress"><div class="progress-fill"></div></div>
+<div class="layout" data-page="module-2">
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <a href="../index.html" class="sidebar-logo">
+        <span class="logo-icon">MCP</span>
+        <span class="logo-text">Intro to MCP</span>
+      </a>
+    </div>
+    <div class="sidebar-progress">
+      <div class="progress-bar"><div class="progress-fill" style="width: 0%"></div></div>
+      <span class="progress-label">0/4 complete</span>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section-label">Course Modules</div>
+      <a href="module-1.html" class="nav-item" data-page="module-1">What MCP Is &amp; When You Need It</a>
+      <a href="module-2.html" class="nav-item" data-page="module-2">Connecting to Existing Servers</a>
+      <a href="module-3.html" class="nav-item" data-page="module-3">Building Your First MCP Server</a>
+      <a href="module-4.html" class="nav-item" data-page="module-4">Private Systems &amp; Write-Back</a>
+      <div class="nav-section-label" style="margin-top: 16px;">Related</div>
+      <a href="../../index.html" class="nav-item">← Claude for Software Engineers</a>
+    </nav>
+  </aside>
+
+  <div class="sidebar-overlay"></div>
+
+  <!-- Main Content -->
+  <main class="main">
+    <div class="topbar">
+      <button class="sidebar-toggle">☰</button>
+      <div class="breadcrumb">
+        <a href="../index.html">MCP Course</a> / <span>Module 2: Connecting to Existing Servers</span>
+      </div>
+    </div>
+    <div class="content">
+
+      <div class="page-header">
+        <span class="page-tag">Module 2</span>
+        <h1 class="page-title">Connecting to Existing Servers</h1>
+        <p class="page-desc">Add public and private MCP servers to Claude Code and share the configuration with your team so everyone gets the same integrations automatically.</p>
+        <div class="page-meta">2 lessons · ~40 minutes · Hands-on</div>
+      </div>
+
+      <!-- Lesson 2-1 -->
+      <h2>Lesson 2-1: Adding MCP Servers to Claude Code</h2>
+      <div class="page-meta">20 min · Hands-on</div>
+
+      <p>Claude Code module 5 introduced <code>claude mcp add</code> briefly. Here we go deeper — different transport types, verifying connections, and understanding what each server actually exposes.</p>
+
+      <h3>Two Transport Types</h3>
+      <p>The transport you use depends on how the server is deployed:</p>
+      <ul>
+        <li><strong>stdio</strong> — Claude spawns the server as a local subprocess. Used with <code>-- npx ...</code> or <code>-- node server.js</code>. No <code>--transport</code> flag needed; the <code>--</code> separator implies stdio.</li>
+        <li><strong>HTTP/SSE</strong> — The server runs remotely. Specify <code>--transport http</code> or <code>--transport sse</code> with the URL.</li>
+      </ul>
+
+      <h3>Adding stdio Servers</h3>
+      <div class="code-block">
+        <div class="code-header">
+          <span>bash</span>
+          <button class="copy-btn">Copy</button>
+        </div>
+        <pre><code># GitHub — read issues, PRs, repos, search code
+claude mcp add github -- npx -y @modelcontextprotocol/server-github
+
+# PostgreSQL — query tables, inspect schemas
+claude mcp add postgres -- npx -y @modelcontextprotocol/server-postgres "postgresql://localhost/mydb"
+
+# Filesystem — read/write files outside the project dir
+claude mcp add files -- npx -y @modelcontextprotocol/server-filesystem /path/to/dir</code></pre>
+      </div>
+
+      <p>Environment variables for secrets go with <code>-e</code>:</p>
+      <div class="code-block">
+        <div class="code-header">
+          <span>bash</span>
+          <button class="copy-btn">Copy</button>
+        </div>
+        <pre><code># GitHub with auth token (required for private repos)
+claude mcp add github -e GITHUB_TOKEN=your_token -- npx -y @modelcontextprotocol/server-github</code></pre>
+      </div>
+
+      <h3>Adding HTTP and SSE Servers</h3>
+      <div class="code-block">
+        <div class="code-header">
+          <span>bash</span>
+          <button class="copy-btn">Copy</button>
+        </div>
+        <pre><code># Sentry — query errors, issues, releases (HTTP)
+claude mcp add --transport http sentry https://mcp.sentry.dev/mcp
+
+# Linear — read and write issues, projects, cycles (SSE)
+claude mcp add --transport sse linear https://mcp.linear.app/sse</code></pre>
+      </div>
+
+      <h3>Verifying Your Connections</h3>
+      <div class="code-block">
+        <div class="code-header">
+          <span>bash</span>
+          <button class="copy-btn">Copy</button>
+        </div>
+        <pre><code># List all configured servers
+claude mcp list
+
+# Inspect a specific server (shows its tools and resources)
+claude mcp get github</code></pre>
+      </div>
+
+      <p>Once connected, you can use the tools in any session. Ask Claude: <em>"What MCP tools do you have available?"</em> — it will list every tool from every connected server.</p>
+
+      <div class="callout tip">
+        <div class="callout-icon">💡</div>
+        <div class="callout-body">
+          <div class="callout-title">Scope Matters: User vs Project</div>
+          <div class="callout-text"><code>claude mcp add</code> stores the server in your user-level config (<code>~/.claude/settings.json</code>) by default — available in all projects. Use <code>--scope project</code> to add it only for the current project. Use <code>--scope local</code> for local-only (not committed to git).</div>
+        </div>
+      </div>
+
+      <!-- Lesson 2-2 -->
+      <h2>Lesson 2-2: Team Config with .mcp.json</h2>
+      <div class="page-meta">20 min · Hands-on</div>
+
+      <p>User-level MCP config is personal — it doesn't travel with the repo. For team-wide config, use <code>.mcp.json</code> at your project root. When a teammate clones the repo, they get the same MCP servers automatically.</p>
+
+      <h3>The .mcp.json Format</h3>
+      <div class="code-block">
+        <div class="code-header">
+          <span>json</span>
+          <button class="copy-btn">Copy</button>
+        </div>
+        <pre><code>{
+  "mcpServers": {
+    "github": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-github"],
+      "env": {
+        "GITHUB_TOKEN": "${GITHUB_TOKEN}"
+      }
+    },
+    "postgres": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-postgres", "${DATABASE_URL}"]
+    },
+    "sentry": {
+      "type": "http",
+      "url": "https://mcp.sentry.dev/mcp"
+    }
+  }
+}</code></pre>
+      </div>
+
+      <p>The <code>${ENV_VAR}</code> syntax interpolates from environment variables — secrets stay out of the committed file.</p>
+
+      <h3>Secrets Strategy</h3>
+      <p>Never commit actual tokens to <code>.mcp.json</code>. Use one of these patterns:</p>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span>bash</span>
+          <button class="copy-btn">Copy</button>
+        </div>
+        <pre><code># Option 1: .env file (add to .gitignore)
+echo "GITHUB_TOKEN=ghp_..." >> .env
+
+# Option 2: Shell profile (available in all projects)
+echo 'export GITHUB_TOKEN=ghp_...' >> ~/.zshrc
+
+# Option 3: Secret manager (best for teams)
+# Load from 1Password, AWS Secrets Manager, etc. in your shell profile</code></pre>
+      </div>
+
+      <h3>What the /from-ticket Skill Now Unlocks</h3>
+      <p>In the Claude for Software Engineers course (module 5), the <code>/from-ticket</code> skill was illustrative — it described fetching ticket data but depended on a human or public URL access. With MCP connected, it becomes real:</p>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span>bash</span>
+          <button class="copy-btn">Copy</button>
+        </div>
+        <pre><code># This now works headlessly — no human needed to paste the ticket
+claude -p "/from-ticket LIN-4521" --dangerously-skip-permissions</code></pre>
+      </div>
+
+      <p>Claude calls the Linear MCP tool, reads the ticket, reads acceptance criteria, and runs the full <code>/ship</code> pipeline — all unattended.</p>
+
+      <div class="callout checkpoint">
+        <div class="callout-icon">✅</div>
+        <div class="callout-body">
+          <div class="callout-title">Checkpoint</div>
+          <div class="callout-text">Add at least one MCP server (GitHub or Sentry are the easiest to start with), run <code>claude mcp list</code> to confirm it's registered, then ask Claude in a session what tools that server provides. Create a <code>.mcp.json</code> for your project with the servers your team needs.</div>
+        </div>
+      </div>
+
+      <div class="page-nav">
+        <a href="module-1.html" class="page-nav-btn prev">
+          <span class="nav-btn-arrow">←</span>
+          <div>
+            <div class="nav-btn-label">Previous</div>
+            <div class="nav-btn-title">What MCP Is &amp; When You Need It</div>
+          </div>
+        </a>
+        <a href="module-3.html" class="page-nav-btn next">
+          <span class="nav-btn-arrow">→</span>
+          <div>
+            <div class="nav-btn-label">Next</div>
+            <div class="nav-btn-title">Building Your First MCP Server</div>
+          </div>
+        </a>
+      </div>
+    </div>
+  </main>
+</div>
+<script src="../../js/main.js"></script>
+</body>
+</html>

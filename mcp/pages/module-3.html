@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Building Your First MCP Server — Introduction to MCP</title>
+  <link rel="stylesheet" href="../../css/styles.css">
+</head>
+<body>
+<div class="reading-progress"><div class="progress-fill"></div></div>
+<div class="layout" data-page="module-3">
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <a href="../index.html" class="sidebar-logo">
+        <span class="logo-icon">MCP</span>
+        <span class="logo-text">Intro to MCP</span>
+      </a>
+    </div>
+    <div class="sidebar-progress">
+      <div class="progress-bar"><div class="progress-fill" style="width: 0%"></div></div>
+      <span class="progress-label">0/4 complete</span>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section-label">Course Modules</div>
+      <a href="module-1.html" class="nav-item" data-page="module-1">What MCP Is &amp; When You Need It</a>
+      <a href="module-2.html" class="nav-item" data-page="module-2">Connecting to Existing Servers</a>
+      <a href="module-3.html" class="nav-item" data-page="module-3">Building Your First MCP Server</a>
+      <a href="module-4.html" class="nav-item" data-page="module-4">Private Systems &amp; Write-Back</a>
+      <div class="nav-section-label" style="margin-top: 16px;">Related</div>
+      <a href="../../index.html" class="nav-item">← Claude for Software Engineers</a>
+    </nav>
+  </aside>
+
+  <div class="sidebar-overlay"></div>
+
+  <!-- Main Content -->
+  <main class="main">
+    <div class="topbar">
+      <button class="sidebar-toggle">☰</button>
+      <div class="breadcrumb">
+        <a href="../index.html">MCP Course</a> / <span>Module 3: Building Your First Server</span>
+      </div>
+    </div>
+    <div class="content">
+
+      <div class="page-header">
+        <span class="page-tag">Module 3</span>
+        <h1 class="page-title">Building Your First MCP Server</h1>
+        <p class="page-desc">Scaffold a Node.js MCP server from scratch, expose a Tool and a Resource, connect it to Claude Code, and test it end-to-end in under an hour.</p>
+        <div class="page-meta">2 lessons · ~60 minutes · Hands-on</div>
+      </div>
+
+      <!-- Lesson 3-1 -->
+      <h2>Lesson 3-1: Scaffold and Expose a Tool</h2>
+      <div class="page-meta">35 min · Hands-on</div>
+
+      <p>We'll build a server that searches an internal wiki. By the end of this lesson it will be connected to Claude Code and answering real queries.</p>
+
+      <h3>1. Project Setup</h3>
+      <div class="code-block">
+        <div class="code-header">
+          <span>bash</span>
+          <button class="copy-btn">Copy</button>
+        </div>
+        <pre><code>mkdir my-mcp-server && cd my-mcp-server
+npm init -y
+npm install @modelcontextprotocol/sdk zod
+npm install -D typescript @types/node tsx</code></pre>
+      </div>
+
+      <p>Add a start script and set the module type in <code>package.json</code>:</p>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span>json</span>
+          <button class="copy-btn">Copy</button>
+        </div>
+        <pre><code>{
+  "type": "module",
+  "scripts": {
+    "start": "node --loader ts-node/esm src/index.ts",
+    "dev": "tsx src/index.ts"
+  }
+}</code></pre>
+      </div>
+
+      <h3>2. The Minimal Server</h3>
+      <p>Create <code>src/index.ts</code>:</p>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span>typescript</span>
+          <button class="copy-btn">Copy</button>
+        </div>
+        <pre><code>import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
+import { z } from "zod";
+
+const server = new McpServer({
+  name: "my-mcp-server",
+  version: "1.0.0",
+});
+
+// ── Tool: search the wiki ────────────────────────────────────
+server.tool(
+  "search-wiki",
+  "Search the internal wiki for documentation on a topic.",
+  { query: z.string().describe("Search query") },
+  async ({ query }) => {
+    // Replace with your real wiki API call
+    const results = await searchWiki(query);
+    return {
+      content: [{ type: "text", text: JSON.stringify(results, null, 2) }],
+    };
+  }
+);
+
+// ── Stub: replace with real wiki search ─────────────────────
+async function searchWiki(query: string) {
+  return [
+    { title: "API Authentication", url: "/wiki/auth", snippet: "..." },
+    { title: "Deployment Guide", url: "/wiki/deploy", snippet: "..." },
+  ];
+}
+
+// ── Start server ─────────────────────────────────────────────
+const transport = new StdioServerTransport();
+await server.connect(transport);</code></pre>
+      </div>
+
+      <h3>3. Connect to Claude Code</h3>
+      <div class="code-block">
+        <div class="code-header">
+          <span>bash</span>
+          <button class="copy-btn">Copy</button>
+        </div>
+        <pre><code>claude mcp add my-wiki -- npx tsx /absolute/path/to/my-mcp-server/src/index.ts</code></pre>
+      </div>
+
+      <h3>4. Test It</h3>
+      <p>Start a Claude Code session and ask:</p>
+      <div class="code-block">
+        <div class="code-header">
+          <span>text</span>
+          <button class="copy-btn">Copy</button>
+        </div>
+        <pre><code>What does our wiki say about authentication?</code></pre>
+      </div>
+
+      <p>Claude will call your <code>search-wiki</code> tool and return the results. If it doesn't, run <code>claude mcp get my-wiki</code> to verify the server registered correctly.</p>
+
+      <div class="callout warning">
+        <div class="callout-icon">⚠️</div>
+        <div class="callout-body">
+          <div class="callout-title">Use Absolute Paths</div>
+          <div class="callout-text">Claude Code spawns the MCP server subprocess from a different working directory. Always use absolute paths in <code>claude mcp add</code> commands, not relative ones. Use <code>$(pwd)/src/index.ts</code> to get the absolute path from your project directory.</div>
+        </div>
+      </div>
+
+      <!-- Lesson 3-2 -->
+      <h2>Lesson 3-2: Adding a Resource and Multiple Tools</h2>
+      <div class="page-meta">25 min · Hands-on</div>
+
+      <p>Now let's extend the server with a Resource (for directly addressable data) and a second Tool, so Claude can both search and fetch specific wiki pages.</p>
+
+      <h3>Adding a Resource</h3>
+      <p>Resources expose data by URI — like files, but from your system:</p>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span>typescript</span>
+          <button class="copy-btn">Copy</button>
+        </div>
+        <pre><code>import { ResourceTemplate } from "@modelcontextprotocol/sdk/server/mcp.js";
+
+// ── Resource: fetch a wiki page by slug ──────────────────────
+server.resource(
+  "wiki-page",
+  new ResourceTemplate("wiki://{slug}", { list: undefined }),
+  async (uri, { slug }) => {
+    const page = await fetchWikiPage(slug as string);
+    return {
+      contents: [{
+        uri: uri.href,
+        mimeType: "text/markdown",
+        text: page.content,
+      }],
+    };
+  }
+);
+
+async function fetchWikiPage(slug: string) {
+  // Replace with your real wiki fetch
+  return { content: `# ${slug}\n\nPage content here...` };
+}</code></pre>
+      </div>
+
+      <h3>Adding a Second Tool</h3>
+      <div class="code-block">
+        <div class="code-header">
+          <span>typescript</span>
+          <button class="copy-btn">Copy</button>
+        </div>
+        <pre><code>// ── Tool: list all wiki pages in a section ──────────────────
+server.tool(
+  "list-wiki-pages",
+  "List all wiki pages in a section or category.",
+  { section: z.string().describe("Section name, e.g. 'engineering', 'onboarding'") },
+  async ({ section }) => {
+    const pages = await listWikiPages(section);
+    return {
+      content: [{ type: "text", text: JSON.stringify(pages, null, 2) }],
+    };
+  }
+);
+
+async function listWikiPages(section: string) {
+  return [
+    { slug: `${section}/overview`, title: "Overview" },
+    { slug: `${section}/setup`, title: "Setup Guide" },
+  ];
+}</code></pre>
+      </div>
+
+      <h3>The Full Server at This Point</h3>
+      <p>Your server now exposes:</p>
+      <ul>
+        <li><strong>Tool:</strong> <code>search-wiki</code> — searches across all pages</li>
+        <li><strong>Tool:</strong> <code>list-wiki-pages</code> — lists pages by section</li>
+        <li><strong>Resource:</strong> <code>wiki://{slug}</code> — fetches a specific page by slug</li>
+      </ul>
+
+      <p>Claude can now navigate your entire internal wiki — searching for topics, listing sections, and reading specific pages — all with structured data, no HTML scraping.</p>
+
+      <div class="callout tip">
+        <div class="callout-icon">💡</div>
+        <div class="callout-body">
+          <div class="callout-title">Tool Descriptions Drive Auto-Invocation</div>
+          <div class="callout-text">The description string you pass to <code>server.tool()</code> is how Claude decides when to use the tool. Write it the same way you'd write a skill description — include the use cases and trigger conditions. A good description means Claude reaches for the right tool without being asked explicitly.</div>
+        </div>
+      </div>
+
+      <div class="callout checkpoint">
+        <div class="callout-icon">✅</div>
+        <div class="callout-body">
+          <div class="callout-title">Checkpoint</div>
+          <div class="callout-text">Your server should have at least two tools and one resource. Reconnect it to Claude Code (<code>claude mcp add</code>), then test each tool explicitly: ask Claude to search, to list a section, and to read a specific page by slug. Verify all three return structured data.</div>
+        </div>
+      </div>
+
+      <div class="page-nav">
+        <a href="module-2.html" class="page-nav-btn prev">
+          <span class="nav-btn-arrow">←</span>
+          <div>
+            <div class="nav-btn-label">Previous</div>
+            <div class="nav-btn-title">Connecting to Existing Servers</div>
+          </div>
+        </a>
+        <a href="module-4.html" class="page-nav-btn next">
+          <span class="nav-btn-arrow">→</span>
+          <div>
+            <div class="nav-btn-label">Next</div>
+            <div class="nav-btn-title">Private Systems &amp; Write-Back</div>
+          </div>
+        </a>
+      </div>
+    </div>
+  </main>
+</div>
+<script src="../../js/main.js"></script>
+</body>
+</html>

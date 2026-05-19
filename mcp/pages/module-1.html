@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>What MCP Is & When You Need It — Introduction to MCP</title>
+  <link rel="stylesheet" href="../../css/styles.css">
+</head>
+<body>
+<div class="reading-progress"><div class="progress-fill"></div></div>
+<div class="layout" data-page="module-1">
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <a href="../index.html" class="sidebar-logo">
+        <span class="logo-icon">MCP</span>
+        <span class="logo-text">Intro to MCP</span>
+      </a>
+    </div>
+    <div class="sidebar-progress">
+      <div class="progress-bar"><div class="progress-fill" style="width: 0%"></div></div>
+      <span class="progress-label">0/4 complete</span>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section-label">Course Modules</div>
+      <a href="module-1.html" class="nav-item" data-page="module-1">What MCP Is &amp; When You Need It</a>
+      <a href="module-2.html" class="nav-item" data-page="module-2">Connecting to Existing Servers</a>
+      <a href="module-3.html" class="nav-item" data-page="module-3">Building Your First MCP Server</a>
+      <a href="module-4.html" class="nav-item" data-page="module-4">Private Systems &amp; Write-Back</a>
+      <div class="nav-section-label" style="margin-top: 16px;">Related</div>
+      <a href="../../index.html" class="nav-item">← Claude for Software Engineers</a>
+    </nav>
+  </aside>
+
+  <div class="sidebar-overlay"></div>
+
+  <!-- Main Content -->
+  <main class="main">
+    <div class="topbar">
+      <button class="sidebar-toggle">☰</button>
+      <div class="breadcrumb">
+        <a href="../index.html">MCP Course</a> / <span>Module 1: What MCP Is</span>
+      </div>
+    </div>
+    <div class="content">
+
+      <div class="page-header">
+        <span class="page-tag">Module 1</span>
+        <h1 class="page-title">What MCP Is &amp; When You Need It</h1>
+        <p class="page-desc">Understand the protocol, the three primitives, and how to decide when MCP is the right tool versus skills, hooks, or plain URL fetching.</p>
+        <div class="page-meta">2 lessons · ~45 minutes · Concept</div>
+      </div>
+
+      <!-- Lesson 1-1 -->
+      <h2>Lesson 1-1: The Protocol and Three Primitives</h2>
+      <div class="page-meta">25 min · Concept</div>
+
+      <p>The Model Context Protocol (MCP) is an open standard that lets Claude communicate with external servers using JSON-RPC 2.0. Think of it as a plug standard — any tool that speaks MCP can connect to any MCP-compatible AI client, including Claude Code.</p>
+
+      <h3>How the Protocol Works</h3>
+      <p>MCP defines a client-server architecture. Claude Code is the client; your server is the bridge to your tools.</p>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span>text</span>
+          <button class="copy-btn">Copy</button>
+        </div>
+        <pre><code>Claude Code (MCP client)
+      ↕ JSON-RPC 2.0 over stdio or HTTP/SSE
+MCP Server (your bridge)
+      ↕ native SDK / REST / DB driver
+Your System (Jira, internal API, database...)</code></pre>
+      </div>
+
+      <p>Two transport options:</p>
+      <ul>
+        <li><strong>stdio</strong> — Claude spawns your server as a subprocess. Fast, local, no network needed. Best for local tools and development.</li>
+        <li><strong>HTTP/SSE</strong> — Your server runs as a persistent service. Best for remote tools, shared team servers, and hosted integrations.</li>
+      </ul>
+
+      <h3>The Three Primitives</h3>
+      <p>Every MCP server exposes some combination of these three building blocks:</p>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span>text</span>
+          <button class="copy-btn">Copy</button>
+        </div>
+        <pre><code>┌─────────────────────────────────────────────────────────┐
+│  Tools       — Callable functions Claude can invoke     │
+│               e.g. search-tickets, create-issue,        │
+│               query-db, post-comment                    │
+├─────────────────────────────────────────────────────────┤
+│  Resources   — Data Claude can read (like files)        │
+│               e.g. ticket://LIN-1234, schema://users,   │
+│               metrics://api/p95-latency                 │
+├─────────────────────────────────────────────────────────┤
+│  Prompts     — Reusable prompt templates from server    │
+│               e.g. "summarize-sprint", "review-PR"      │
+└─────────────────────────────────────────────────────────┘</code></pre>
+      </div>
+
+      <h3>Tools vs Resources — When to Use Which</h3>
+      <ul>
+        <li>Use a <strong>Tool</strong> when Claude needs to <em>do something</em> — query, create, update, delete, search.</li>
+        <li>Use a <strong>Resource</strong> when Claude needs to <em>read something specific</em> by URI — like a file, a record, a schema.</li>
+        <li>Use a <strong>Prompt</strong> when you want the server to supply a reusable prompt template that changes based on server-side context.</li>
+      </ul>
+
+      <p>Most real-world servers primarily expose Tools. Resources and Prompts are less common but powerful for specific use cases.</p>
+
+      <div class="callout tip">
+        <div class="callout-icon">💡</div>
+        <div class="callout-body">
+          <div class="callout-title">Tools Are the Core Primitive</div>
+          <div class="callout-text">In practice, most MCP servers you build will expose only Tools. Start there. Add Resources when you have clearly addressable data (records with stable URIs). Add Prompts only if your server has context that should drive the prompt itself.</div>
+        </div>
+      </div>
+
+      <!-- Lesson 1-2 -->
+      <h2>Lesson 1-2: MCP vs Skills vs Hooks — The Decision Framework</h2>
+      <div class="page-meta">20 min · Concept</div>
+
+      <p>In the Claude for Software Engineers course you already have skills, subagents, and hooks. MCP is a fourth layer — and it's the most expensive to set up. Here's exactly when each approach wins.</p>
+
+      <h3>The Honest Comparison</h3>
+
+      <div class="callout warning">
+        <div class="callout-icon">⚠️</div>
+        <div class="callout-body">
+          <div class="callout-title">Claude Can Already Fetch Public URLs</div>
+          <div class="callout-text">If your tool is publicly accessible — GitHub, Linear, Sentry — Claude can fetch it via URL in an interactive session. MCP adds overhead without payoff for public tools used interactively. Be honest with yourself about whether you actually need it before building a server.</div>
+        </div>
+      </div>
+
+      <h3>Decision Table</h3>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Scenario</th>
+            <th>Best Approach</th>
+            <th>Why</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Reusable task template (code review, commit message)</td>
+            <td>Skill</td>
+            <td>No external system needed — just instructions and command injection</td>
+          </tr>
+          <tr>
+            <td>Block a dangerous command, auto-lint after edit</td>
+            <td>Hook</td>
+            <td>Deterministic enforcement at a lifecycle event</td>
+          </tr>
+          <tr>
+            <td>Read a public GitHub issue or Linear ticket interactively</td>
+            <td>URL fetch (no MCP)</td>
+            <td>Claude can already do this — no server needed</td>
+          </tr>
+          <tr>
+            <td>Read from a private internal API or database</td>
+            <td>MCP</td>
+            <td>Claude cannot reach private systems without a bridge</td>
+          </tr>
+          <tr>
+            <td>Headless workflow that needs ticket data (no human present)</td>
+            <td>MCP</td>
+            <td>No human to paste content; needs programmatic access</td>
+          </tr>
+          <tr>
+            <td>Write back to a system — move ticket, post comment, update DB</td>
+            <td>MCP</td>
+            <td>URL fetching is read-only; Tools can take actions</td>
+          </tr>
+          <tr>
+            <td>Structured data from an API (not HTML scraping)</td>
+            <td>MCP</td>
+            <td>Tools return clean JSON; fetching returns HTML with noise</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>The Four Genuine MCP Advantages</h3>
+      <ol>
+        <li><strong>Private systems</strong> — Internal APIs, private databases, Confluence, internal Jira. Claude has no path there without your server as a bridge.</li>
+        <li><strong>Headless automation</strong> — In cron jobs and CI pipelines running <code>claude -p</code>, there's no human to paste content. MCP gives those workflows programmatic access.</li>
+        <li><strong>Write-back actions</strong> — Moving a ticket to "In Review", posting a PR comment, updating a database record. URL fetching is read-only. MCP Tools can mutate state.</li>
+        <li><strong>Structured data</strong> — A Tool returns the exact JSON fields you want. Fetching a URL returns raw HTML that Claude has to parse, which introduces noise and failures.</li>
+      </ol>
+
+      <div class="callout checkpoint">
+        <div class="callout-icon">✅</div>
+        <div class="callout-body">
+          <div class="callout-title">Checkpoint</div>
+          <div class="callout-text">Before moving on, identify one real system in your workflow that hits at least one of the four advantages above — ideally a private internal tool or a write-back use case. That's what you'll connect in Module 4.</div>
+        </div>
+      </div>
+
+      <div class="page-nav">
+        <a href="../index.html" class="page-nav-btn prev">
+          <span class="nav-btn-arrow">←</span>
+          <div>
+            <div class="nav-btn-label">Previous</div>
+            <div class="nav-btn-title">Course Home</div>
+          </div>
+        </a>
+        <a href="module-2.html" class="page-nav-btn next">
+          <span class="nav-btn-arrow">→</span>
+          <div>
+            <div class="nav-btn-label">Next</div>
+            <div class="nav-btn-title">Connecting to Existing Servers</div>
+          </div>
+        </a>
+      </div>
+    </div>
+  </main>
+</div>
+<script src="../../js/main.js"></script>
+</body>
+</html>

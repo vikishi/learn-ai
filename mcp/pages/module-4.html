@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Private Systems & Write-Back — Introduction to MCP</title>
+  <link rel="stylesheet" href="../../css/styles.css">
+</head>
+<body>
+<div class="reading-progress"><div class="progress-fill"></div></div>
+<div class="layout" data-page="module-4">
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <a href="../index.html" class="sidebar-logo">
+        <span class="logo-icon">MCP</span>
+        <span class="logo-text">Intro to MCP</span>
+      </a>
+    </div>
+    <div class="sidebar-progress">
+      <div class="progress-bar"><div class="progress-fill" style="width: 0%"></div></div>
+      <span class="progress-label">0/4 complete</span>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section-label">Course Modules</div>
+      <a href="module-1.html" class="nav-item" data-page="module-1">What MCP Is &amp; When You Need It</a>
+      <a href="module-2.html" class="nav-item" data-page="module-2">Connecting to Existing Servers</a>
+      <a href="module-3.html" class="nav-item" data-page="module-3">Building Your First MCP Server</a>
+      <a href="module-4.html" class="nav-item" data-page="module-4">Private Systems &amp; Write-Back</a>
+      <div class="nav-section-label" style="margin-top: 16px;">Related</div>
+      <a href="../../index.html" class="nav-item">← Claude for Software Engineers</a>
+    </nav>
+  </aside>
+
+  <div class="sidebar-overlay"></div>
+
+  <!-- Main Content -->
+  <main class="main">
+    <div class="topbar">
+      <button class="sidebar-toggle">☰</button>
+      <div class="breadcrumb">
+        <a href="../index.html">MCP Course</a> / <span>Module 4: Private Systems &amp; Write-Back</span>
+      </div>
+    </div>
+    <div class="content">
+
+      <div class="page-header">
+        <span class="page-tag">Module 4</span>
+        <h1 class="page-title">Private Systems &amp; Write-Back</h1>
+        <p class="page-desc">Connect Claude to internal APIs and databases it can't reach otherwise, add write-back actions that mutate state, and deploy your server for the whole team.</p>
+        <div class="page-meta">2 lessons · ~50 minutes · Advanced</div>
+      </div>
+
+      <!-- Lesson 4-1 -->
+      <h2>Lesson 4-1: Connecting Private Internal Systems</h2>
+      <div class="page-meta">25 min · Hands-on</div>
+
+      <p>This is the scenario where MCP has no substitute — private systems that Claude fundamentally cannot reach by fetching URLs. Here's how to connect them safely.</p>
+
+      <h3>Pattern 1: Internal REST API</h3>
+      <p>A tool that calls your internal API with a service account token:</p>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span>typescript</span>
+          <button class="copy-btn">Copy</button>
+        </div>
+        <pre><code">// Auth: read token from env, never hardcode
+const INTERNAL_API_TOKEN = process.env.INTERNAL_API_TOKEN;
+const INTERNAL_API_BASE = process.env.INTERNAL_API_BASE ?? "https://api.internal.mycompany.com";
+
+server.tool(
+  "get-feature-flags",
+  "Get current feature flag values for a service or user segment.",
+  {
+    service: z.string().describe("Service name, e.g. 'checkout', 'auth'"),
+    environment: z.enum(["staging", "production"]).default("staging"),
+  },
+  async ({ service, environment }) => {
+    const res = await fetch(`${INTERNAL_API_BASE}/flags/${service}?env=${environment}`, {
+      headers: { Authorization: `Bearer ${INTERNAL_API_TOKEN}` },
+    });
+    if (!res.ok) throw new Error(`API error: ${res.status}`);
+    const flags = await res.json();
+    return { content: [{ type: "text", text: JSON.stringify(flags, null, 2) }] };
+  }
+);</code></pre>
+      </div>
+
+      <h3>Pattern 2: Internal Database</h3>
+      <p>Query a private database — be explicit about read-only access in the tool description to set correct expectations with Claude:</p>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span>typescript</span>
+          <button class="copy-btn">Copy</button>
+        </div>
+        <pre><code">import postgres from "postgres";
+
+const sql = postgres(process.env.DATABASE_URL!);
+
+server.tool(
+  "query-metrics",
+  "Run a read-only query against the metrics database. Use for answering questions about usage, errors, and performance. Do not use for writes.",
+  {
+    query: z.string().describe("SQL SELECT query only"),
+  },
+  async ({ query }) => {
+    // Guard: reject anything that isn't a SELECT
+    if (!/^\s*SELECT/i.test(query)) {
+      throw new Error("Only SELECT queries are allowed");
+    }
+    const rows = await sql.unsafe(query);
+    return { content: [{ type: "text", text: JSON.stringify(rows, null, 2) }] };
+  }
+);</code></pre>
+      </div>
+
+      <h3>Auth Patterns</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Pattern</th>
+            <th>How</th>
+            <th>Best For</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>API Key</td>
+            <td><code>-e API_KEY=xxx</code> in <code>claude mcp add</code></td>
+            <td>Simple internal APIs</td>
+          </tr>
+          <tr>
+            <td>Service Account</td>
+            <td>Dedicated non-personal credentials in env</td>
+            <td>Production systems, team servers</td>
+          </tr>
+          <tr>
+            <td>Shell Profile</td>
+            <td>Export in <code>~/.zshrc</code> or <code>~/.bashrc</code></td>
+            <td>Developer laptops, personal access</td>
+          </tr>
+          <tr>
+            <td>Secret Manager</td>
+            <td>Load from 1Password CLI, AWS Secrets Manager at shell start</td>
+            <td>Regulated environments, shared CI</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="callout critical">
+        <div class="callout-icon">🛑</div>
+        <div class="callout-body">
+          <div class="callout-title">Never Commit Credentials</div>
+          <div class="callout-text">Tokens in <code>.mcp.json</code> get committed and shared. Always use <code>${ENV_VAR}</code> interpolation in <code>.mcp.json</code> and store the actual values in your shell profile or a secret manager — never in the file itself.</div>
+        </div>
+      </div>
+
+      <!-- Lesson 4-2 -->
+      <h2>Lesson 4-2: Write-Back Actions and Team Deployment</h2>
+      <div class="page-meta">25 min · Hands-on</div>
+
+      <p>Read access is useful. Write-back is where MCP completes the loop — Claude can now take actions on your systems, not just read from them.</p>
+
+      <h3>Example: Jira Write-Back Tools</h3>
+      <p>Three tools that together enable the full ticket-to-PR workflow:</p>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span>typescript</span>
+          <button class="copy-btn">Copy</button>
+        </div>
+        <pre><code">const JIRA_BASE = process.env.JIRA_BASE!;
+const JIRA_TOKEN = process.env.JIRA_TOKEN!;
+
+const jira = (path: string, method = "GET", body?: object) =>
+  fetch(`${JIRA_BASE}/rest/api/3${path}`, {
+    method,
+    headers: {
+      Authorization: `Basic ${Buffer.from(process.env.JIRA_EMAIL + ":" + JIRA_TOKEN).toString("base64")}`,
+      "Content-Type": "application/json",
+    },
+    body: body ? JSON.stringify(body) : undefined,
+  }).then((r) => r.json());
+
+// Read: get ticket details
+server.tool(
+  "get-ticket",
+  "Fetch details of a Jira ticket by ID, including description, acceptance criteria, and current status.",
+  { id: z.string().describe("Ticket ID, e.g. ENG-1234") },
+  async ({ id }) => {
+    const issue = await jira(`/issue/${id}`);
+    return { content: [{ type: "text", text: JSON.stringify(issue.fields, null, 2) }] };
+  }
+);
+
+// Write: move ticket to a new status
+server.tool(
+  "transition-ticket",
+  "Move a Jira ticket to a new status, e.g. from 'In Progress' to 'In Review'.",
+  {
+    id: z.string().describe("Ticket ID"),
+    status: z.enum(["In Progress", "In Review", "Done"]),
+  },
+  async ({ id, status }) => {
+    const transitions = await jira(`/issue/${id}/transitions`);
+    const target = transitions.transitions.find((t: any) => t.name === status);
+    if (!target) throw new Error(`Transition '${status}' not available for ${id}`);
+    await jira(`/issue/${id}/transitions`, "POST", { transition: { id: target.id } });
+    return { content: [{ type: "text", text: `${id} moved to "${status}"` }] };
+  }
+);
+
+// Write: post a comment
+server.tool(
+  "comment-on-ticket",
+  "Add a comment to a Jira ticket. Use to report progress, link PRs, or note blockers.",
+  {
+    id: z.string().describe("Ticket ID"),
+    comment: z.string().describe("Comment text in plain text"),
+  },
+  async ({ id, comment }) => {
+    await jira(`/issue/${id}/comment`, "POST", {
+      body: { type: "doc", version: 1, content: [{ type: "paragraph", content: [{ type: "text", text: comment }] }] },
+    });
+    return { content: [{ type: "text", text: `Comment added to ${id}` }] };
+  }
+);</code></pre>
+      </div>
+
+      <h3>The Complete /from-ticket Flow — Now Real</h3>
+      <p>With these tools wired up, the <code>/from-ticket</code> skill from module 5 of Claude for Software Engineers becomes a fully automated pipeline:</p>
+
+      <div class="code-block">
+        <div class="code-header">
+          <span>text</span>
+          <button class="copy-btn">Copy</button>
+        </div>
+        <pre><code">1. get-ticket ENG-4521        → reads description, acceptance criteria
+2. Explore codebase           → finds relevant files
+3. Implement + write tests    → follows project conventions
+4. /ship                      → review, lint, commit, push, open PR
+5. transition-ticket ENG-4521 "In Review"  → moves ticket
+6. comment-on-ticket ENG-4521  → posts PR link and summary</code></pre>
+      </div>
+
+      <p>A single command. No human involvement once it starts.</p>
+
+      <h3>Deploying for Your Team</h3>
+      <p>Two options depending on your team's needs:</p>
+
+      <h4>Option 1: npm Package (Recommended for Internal Tools)</h4>
+      <div class="code-block">
+        <div class="code-header">
+          <span>bash</span>
+          <button class="copy-btn">Copy</button>
+        </div>
+        <pre><code"># Publish to your internal npm registry
+npm publish --registry https://npm.yourcompany.com
+
+# Teammates add it with:
+claude mcp add jira -e JIRA_TOKEN=$JIRA_TOKEN -- npx -y @yourcompany/jira-mcp</code></pre>
+      </div>
+
+      <h4>Option 2: Commit to Repo + .mcp.json</h4>
+      <div class="code-block">
+        <div class="code-header">
+          <span>bash</span>
+          <button class="copy-btn">Copy</button>
+        </div>
+        <pre><code"># Commit your server to the repo
+git add .claude/mcp/ && git commit -m "Add internal MCP server"
+
+# .mcp.json points to the local server
+{
+  "mcpServers": {
+    "jira": {
+      "command": "node",
+      "args": [".claude/mcp/jira/index.js"],
+      "env": { "JIRA_TOKEN": "${JIRA_TOKEN}" }
+    }
+  }
+}</code></pre>
+      </div>
+
+      <div class="callout tip">
+        <div class="callout-icon">💡</div>
+        <div class="callout-body">
+          <div class="callout-title">Add Your Server to the .claude/ Directory</div>
+          <div class="callout-text">Storing your MCP server under <code>.claude/mcp/</code> keeps all Claude Code tooling in one place — alongside skills, agents, hooks, and settings. When a developer clones the repo, they get the full automation suite including your custom MCP server.</div>
+        </div>
+      </div>
+
+      <div class="callout checkpoint">
+        <div class="callout-icon">🎯</div>
+        <div class="callout-body">
+          <div class="callout-title">Final Checkpoint</div>
+          <div class="callout-text">Your server should now connect to at least one private system and have at least one write-back tool. Test the full loop: ask Claude to read a record, make a change in your codebase based on it, then write back to the system (update a status, post a comment). Commit the server and <code>.mcp.json</code> to your repo.</div>
+        </div>
+      </div>
+
+      <div class="page-nav">
+        <a href="module-3.html" class="page-nav-btn prev">
+          <span class="nav-btn-arrow">←</span>
+          <div>
+            <div class="nav-btn-label">Previous</div>
+            <div class="nav-btn-title">Building Your First MCP Server</div>
+          </div>
+        </a>
+        <a href="../index.html" class="page-nav-btn next">
+          <span class="nav-btn-arrow">→</span>
+          <div>
+            <div class="nav-btn-label">Done</div>
+            <div class="nav-btn-title">Course Home</div>
+          </div>
+        </a>
+      </div>
+    </div>
+  </main>
+</div>
+<script src="../../js/main.js"></script>
+</body>
+</html>
