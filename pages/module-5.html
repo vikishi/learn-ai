@@ -188,17 +188,17 @@
           <span>bash</span>
           <button class="copy-btn">Copy</button>
         </div>
-        <pre><code># Connect to GitHub (issues, PRs, repos)
-claude mcp add github -- npx -y @anthropic-ai/github-mcp
+        <pre><code># Connect to GitHub (issues, PRs, repos) — stdio server
+claude mcp add github -- npx -y @modelcontextprotocol/server-github
 
-# Connect to PostgreSQL (query databases directly)
-claude mcp add postgres -- npx -y @anthropic-ai/postgres-mcp --connection-string "..."
+# Connect to PostgreSQL (query databases directly) — stdio server
+claude mcp add postgres -- npx -y @modelcontextprotocol/server-postgres "postgresql://localhost/mydb"
 
-# Connect to Linear (project management)
-claude mcp add linear --env LINEAR_API_KEY=your_key -- npx -y @anthropic-ai/linear-mcp
+# Connect to Linear (project management) — SSE server
+claude mcp add --transport sse linear https://mcp.linear.app/sse
 
-# Connect to Sentry (error monitoring)
-claude mcp add sentry --env SENTRY_AUTH_TOKEN=your_token -- npx -y @anthropic-ai/sentry-mcp</code></pre>
+# Connect to Sentry (error monitoring) — HTTP server
+claude mcp add --transport http sentry https://mcp.sentry.dev/mcp</code></pre>
       </div>
 
       <h3>The "Implement from Ticket" Skill</h3>
